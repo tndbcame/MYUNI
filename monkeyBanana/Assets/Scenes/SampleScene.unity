@@ -330,7 +330,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tamagokakegohan: {fileID: 507905881}
   siroigohan: {fileID: 757341275}
-  minSecondsForChengetexture: 5
+  minSecondsForChengetexture: 4
   maxSecondsForChengetexture: 8
   _timerText: {fileID: 1088203931}
 --- !u!4 &710624824
