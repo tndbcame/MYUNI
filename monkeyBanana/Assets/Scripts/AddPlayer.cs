@@ -1,43 +1,63 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class AddPlayer : MonoBehaviour
 {
     //canvas
-    public GameObject Canvas;
+    public GameObject Content;
 
     //bottun
     public GameObject AddPlayerBottun;
-    private Transform AddPlayerBottunPos;
-    private Vector2 AddPlayerBottunPosY;
 
     //inputfield
-    public GameObject PlayerEntryField;
+    public GameObject playerEntryFieldkara;
+    public GameObject playerEntryField1;
+    public GameObject playerEntryField2;
 
-    private int clickCount = 0;
+    private int playerNum;
+    public static List<string> playerNameLists;
 
-    public void OnAddPlayerButtonClicked()
+    public string GetPlayerEntryField(Transform playerEntryField)
     {
-        if (clickCount  == 0)
+        playerNum += 1; 
+        GameObject playerEntryFieldText = playerEntryField.Find("Text").gameObject;
+        Text inputFieldText = playerEntryFieldText.GetComponent<Text>();
+        if(inputFieldText.text == "")
         {
-            //AddPlayerBottunPos‚Ì‰Šú‰»
-            AddPlayerBottunPos = AddPlayerBottun.transform;
-            AddPlayerBottunPosY = AddPlayerBottunPos.position;
-
-            clickCount += 1;
+            string defaultPlayerName = "ãƒ—ãƒ¬ãƒ¼ãƒ¤ãƒ¼ " + playerNum;
+            return defaultPlayerName;
         }
 
-
-        //PlayerEntryField‚ÌƒNƒ[ƒ“¶¬
-        GameObject PlayerEntryFieldClone = (GameObject)Instantiate(PlayerEntryField);
-        PlayerEntryFieldClone.transform.SetParent(Canvas.transform, false);
-        Transform PlayerEntryFieldClonePos = PlayerEntryFieldClone.transform;
-        PlayerEntryFieldClonePos.position = AddPlayerBottunPos.position;
-
-        //AddPlayerBottun‚ÌˆÊ’u‚ğ‰º‚°‚é
-        AddPlayerBottunPosY.y -= 30;
-        AddPlayerBottunPos.position = AddPlayerBottunPosY;
+        return inputFieldText.text;
     }
 
+    public void OnAddPlayerButtonClicked()
+    { 
+
+        GameObject PlayerEntryFieldClone = (GameObject)Instantiate(playerEntryFieldkara);
+        PlayerEntryFieldClone.transform.SetParent(Content.transform, false);
+        AddPlayerBottun.transform.SetAsLastSibling();
+    }
+
+    public void OnNextButtonClicked()
+    {
+        playerNum = 0;
+        List<string> playerNameList = new List<string>();
+        foreach (Transform child in Content.transform)
+        {
+            // å­ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã«å¯¾ã™ã‚‹å‡¦ç†ã‚’ã“ã“ã«æ›¸ã
+            playerNameList.Add(GetPlayerEntryField(child));
+        }
+        playerNameList.RemoveAt(playerNameList.Count - 1);
+
+        playerNameLists = playerNameList;
+        SceneManager.LoadScene("MultiMenu");
+    }
+
+    internal class player
+    {
+    }
 }

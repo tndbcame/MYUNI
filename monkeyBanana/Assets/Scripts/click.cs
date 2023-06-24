@@ -6,6 +6,8 @@ using UnityEngine.UI;
 
 public class click : MonoBehaviour
 {
+
+    List<string> playerNameList = AddPlayer.playerNameLists;
     public GameObject tamagokakegohan;
     public GameObject siroigohan;
 

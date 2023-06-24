@@ -16,4 +16,9 @@ public class MainMenuController : MonoBehaviour
         SceneManager.LoadScene("SoloMainMenu");
     }
 
+    public void OnMultiPlayButtonClicked()
+    {
+        SceneManager.LoadScene("AddPlayerMenu");
+    }
+
 }
