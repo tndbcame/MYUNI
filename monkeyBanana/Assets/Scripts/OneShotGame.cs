@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
-public class click : MonoBehaviour
+public class OneShotGame : MonoBehaviour
 {
-
     List<string> playerNameList = AddPlayer.playerNameLists;
     public GameObject tamagokakegohan;
     public GameObject siroigohan;
@@ -21,6 +21,7 @@ public class click : MonoBehaviour
     private bool _isStart = false;
     private bool isTimer = false;
     private float TimerCount = 0;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -58,7 +59,9 @@ public class click : MonoBehaviour
             if (Input.GetMouseButtonDown(0))
             {
                 isTimer = false;
+                GameController.__score = get_score(TimerCount);
                 _timerText.text = TimerCount.ToString("f3");
+                SceneManager.LoadScene("FinishGameScreen");
             }
         }
 
@@ -84,4 +87,13 @@ public class click : MonoBehaviour
     //    }
     //    _timerText.text = TimerCount.ToString("f3");
     //}
+
+    //スコア取得
+    private string get_score(float time)
+    {
+        string score = (1000000 / (int)time).ToString();
+        return score;
+    }
+
+
 }

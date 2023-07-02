@@ -57,7 +57,7 @@ public class AddPlayer : MonoBehaviour
         SceneManager.LoadScene("MultiMenu");
     }
 
-    internal class player
-    {
-    }
+    //internal class player
+    //{
+    //}
 }
