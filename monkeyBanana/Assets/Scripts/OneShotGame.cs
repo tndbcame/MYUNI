@@ -67,10 +67,6 @@ public class OneShotGame : MonoBehaviour
 
     }
 
-    //IEnumerator waitSecond(float f)
-    //{
-    //    yield return new WaitForSeconds(f);
-    //}
 
     private float GetRndSeconds()
     {
@@ -79,14 +75,6 @@ public class OneShotGame : MonoBehaviour
 
         return (float)rndSeco;
     }
-    //private void FixedUpdate()
-    //{
-    //    if (isTimer)
-    //    {
-    //        TimerCount += Time.deltaTime;
-    //    }
-    //    _timerText.text = TimerCount.ToString("f3");
-    //}
 
     //スコア取得
     private string get_score(float time)

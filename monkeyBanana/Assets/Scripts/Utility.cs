@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class GetScore : MonoBehaviour
+public class Utility : MonoBehaviour
 {
     //ゲームのスコア表示用変数
     [SerializeField] private Text score;
+
 
     //スコア取得
     private void Start()
