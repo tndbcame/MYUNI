@@ -39,10 +39,7 @@ public class OneShotGame : MonoBehaviour
         BeforePosSiro = sirogohan.position;
         sirogohan.position = BeforePosTama;
         tamagokake.position = BeforePosSiro;
-        if (BeforePosSiro.Equals(tamagokakegohan.transform.position))
-        {
-            isTimer = true;
-        }
+        isTimer = true;
     }
 
 
@@ -79,8 +76,8 @@ public class OneShotGame : MonoBehaviour
     //スコア取得
     private string get_score(float time)
     {
-        string score = (1000000 / (int)time).ToString();
-        return score;
+        int score = (int)(1000000 / (double)time);
+        return score.ToString();
     }
 
 

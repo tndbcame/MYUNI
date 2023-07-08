@@ -54,7 +54,7 @@ public class AddPlayer : MonoBehaviour
         playerNameList.RemoveAt(playerNameList.Count - 1);
 
         playerNameLists = playerNameList;
-        SceneManager.LoadScene("MultiMenu");
+        SceneManager.LoadScene("GameMenu");
     }
 
     //internal class player
