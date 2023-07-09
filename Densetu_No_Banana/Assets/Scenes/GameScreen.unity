@@ -261,8 +261,8 @@ MonoBehaviour:
   shinybanana: {fileID: 939644634}
   blackBanana: {fileID: 1520209266}
   getBananaMonkey: {fileID: 427885161}
-  min: 5
-  max: 10
+  min: 2
+  max: 7
 --- !u!1 &186662136
 GameObject:
   m_ObjectHideFlags: 0
