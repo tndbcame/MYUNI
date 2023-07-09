@@ -38,7 +38,7 @@ public class GameController : MonoBehaviour
     //ゲットしたサルのポジション操作用
     private Transform __getBananaMonkey;
     //ゲットしたサルの初期ポジション
-    private Vector2 retentionPositionGetBananaMonkey;
+    private Vector3 retentionPositionGetBananaMonkey;
 
     //ランダムインスタンス生成
     System.Random random = new System.Random();
@@ -95,10 +95,10 @@ public class GameController : MonoBehaviour
         {
             Vector2 shinybananaCandidatePos = await BananaLife(min, max);
 
-            //光っているバナナと保持用変数が一緒かどうか判定
-            if (__shinybanana.position.Equals(retentionPositionShinybanana))
+            //光っているバナナ、ゲットバナナサルとが保持用変数が一緒かどうか判定
+            if (__shinybanana.position.Equals(retentionPositionShinybanana) && __getBananaMonkey.position.Equals(retentionPositionGetBananaMonkey))
             {
-                __shinybanana.position = shinybananaCandidatePos;
+                    __shinybanana.position = shinybananaCandidatePos;
             }
             //光らず死んだバナナの位置をリストに戻す
             else
