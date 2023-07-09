@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
+using System.Threading;
+using System.Threading.Tasks;
+using UnityEngine.SceneManagement;
 
 public class GameController : MonoBehaviour
 {
@@ -14,18 +17,43 @@ public class GameController : MonoBehaviour
     [SerializeField] private GameObject shinybanana;
     //黒バナナ
     [SerializeField] private GameObject blackBanana;
+
+    //バナナをゲットしたときのサル
+    [SerializeField] private GameObject getBananaMonkey;
+
     //何秒に1回バナナを生成する決めるときの変数
-    [SerializeField] private double sec;
+    [SerializeField] private int min;
+    [SerializeField] private int max;
+
 
     //バナナの出現ポジションリスト
     List<Vector2> bananaAprPosList = new List<Vector2>();
     //バナナリスト
     Dictionary<int, GameObject> bananasList = new Dictionary<int, GameObject>();
+    //光るバナナのポジション操作用
+    private Transform __shinybanana;
+    //光るバナナポジション保持用変数
+    private Vector2 retentionPositionShinybanana;
+
+    //ゲットしたサルのポジション操作用
+    private Transform __getBananaMonkey;
+    //ゲットしたサルの初期ポジション
+    private Vector2 retentionPositionGetBananaMonkey;
 
     //ランダムインスタンス生成
     System.Random random = new System.Random();
+    //光ったバナナをタップしたときのカウント変数
+    int shinybananaCount = 0;
+
+    //クリックしたゲームオブジェクト
+    GameObject clickedGameObject;
+
+    //uniTaskキャンセル用トークン生成
+    CancellationTokenSource cts = new CancellationTokenSource();
+    CancellationToken token;
 
 
+    //初期設定
     void Start()
     {
         // bananasの子オブジェクトの数を取得
@@ -44,37 +72,102 @@ public class GameController : MonoBehaviour
             Transform banana = bananas.transform.GetChild(i);
             bananasList.Add(i,banana.gameObject);
         }
+
+        //光るバナナのポジションの初期値を設定と保持
+        __shinybanana = shinybanana.transform;
+        retentionPositionShinybanana = __shinybanana.position;
+
+        //ゲットバナナサルの初期位置取得
+        __getBananaMonkey = getBananaMonkey.transform;
+        retentionPositionGetBananaMonkey = __getBananaMonkey.position;
+
+        //キャンセルトークン初期化
+        token = cts.Token;
     }
+
 
     async void Update()
     {
-        await BananaLife(sec);
+        //バナナを入れ替える用のポジションが存在しているときにバナナ生成するよ
+        if (bananaAprPosList?.Count > 0)
+        {
+            Vector2 shinybananaCandidatePos = await BananaLife(min, max);
+
+            //光っているバナナと保持用変数が一緒かどうか判定
+            if (__shinybanana.position.Equals(retentionPositionShinybanana))
+            {
+                __shinybanana.position = shinybananaCandidatePos;
+            }
+        }
+        
+
+        //タップしたゲームオブジェクトを取得する
+        if (Input.GetMouseButtonDown(0))
+        {
+            clickedGameObject = null;
+
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit2D hit2d = Physics2D.Raycast((Vector2)ray.origin, (Vector2)ray.direction);
+
+            if (hit2d)
+            {
+                clickedGameObject = hit2d.transform.gameObject;
+                if(clickedGameObject == shinybanana)
+                {
+                    //光るバナナのタップした回数を数える
+                    shinybananaCount += 1;
+
+                    //ゲットバナナサルと位置を入れ替える
+                    __getBananaMonkey.position = __shinybanana.position;
+
+                    //shinybananaを初期位置を入れ替える
+                    __shinybanana.position = retentionPositionShinybanana;
+
+                    await UniTask.Delay(TimeSpan.FromSeconds(1), cancellationToken: token);
+
+                    //ゲットバナナサルを初期位置に戻す
+                    __getBananaMonkey.position = retentionPositionGetBananaMonkey;
+
+                }
+                else
+                {
+                    cts.Cancel();
+                    SceneManager.LoadScene("FinishGameScreen");
+                }
+            }
+
+        }
     }
 
-    //バナナの人生
-    async UniTask BananaLife(double sec)
+    //バナナの生成〜消滅
+    async UniTask<Vector2> BananaLife(int min, int max)
     {
-        await UniTask.Delay(TimeSpan.FromSeconds(sec));
+        //ポジションを保持する
+        Vector2 retentionPosition = get_replace_bananas();
 
-        //バナナのClone生成
-        GameObject bananasClone = (GameObject)Instantiate(bananas);
-        Debug.Log("バナナを生成しました。");
+        //ループしながら次のバナナへ遷移
+        foreach (int BananaIndex in decide_bananas_to_use(banana_transition_count()))
+        {
+            int sec = random.Next(min, max);
+            
 
+            //バナナのClone生成
+            GameObject BananaClone = (GameObject)Instantiate(bananasList[BananaIndex]);
+            Transform __bananaClone = BananaClone.transform;
+            Debug.Log("バナナを生成しました。");
 
+            //ポジションリストからポジションを入れ替える
+            __bananaClone.position = retentionPosition;
 
+            //指定した時間分待つ
+            await UniTask.Delay(TimeSpan.FromSeconds(sec), cancellationToken: token);
 
-    }
+            //バナナオブジェクト削除
+            Destroy(BananaClone);
+        }
 
-    //バナナをタップされた回数を数える処理
+        return retentionPosition;
 
-    //posListの中からランダムにバナナの位置を入れ替える処理
-    private void replace_bananas()
-    {
-        int rnd = random.Next(bananaAprPosList.Count);
-
-        //bananaAprPosListから取得して削除
-        Vector2 pos = bananaAprPosList[rnd];
-        bananaAprPosList.RemoveAt(rnd);
     }
 
     //何段階か決める処理
@@ -91,7 +184,7 @@ public class GameController : MonoBehaviour
         var BananaIndex = new List<int>();
 
         //最初のバナナのインデックスを決める
-        int __transitionCount = bananaAprPosList.Count - transitionCount;
+        int __transitionCount = bananasList.Count - transitionCount;
         int min = 0;
 
         //段階の応じてランダムで生成されるバナナを決める
@@ -101,5 +194,17 @@ public class GameController : MonoBehaviour
             BananaIndex.Add(min);
         }
         return BananaIndex;
+    }
+
+    //posListの中からランダムにバナナの入れ替える用位置を取得
+    private Vector2 get_replace_bananas()
+    {
+        int rnd = random.Next(bananaAprPosList.Count);
+
+        //bananaAprPosListから取得して削除
+        Vector2 pos = bananaAprPosList[rnd];
+        bananaAprPosList.RemoveAt(rnd);
+
+        return pos;
     }
 }
