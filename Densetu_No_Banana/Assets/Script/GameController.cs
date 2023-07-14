@@ -25,6 +25,9 @@ public class GameController : MonoBehaviour
     [SerializeField] private int min;
     [SerializeField] private int max;
 
+    //黒いバナナに変化するまでの時間
+    [SerializeField] private float chengingTimeForBlackBana; 
+
 
     //バナナの出現ポジションリスト
     List<Vector2> bananaAprPosList = new List<Vector2>();
@@ -34,6 +37,12 @@ public class GameController : MonoBehaviour
     private Transform __shinybanana;
     //光るバナナポジション保持用変数
     private Vector2 retentionPositionShinybanana;
+    //ブラックバナナのポジション操作用
+    private Transform __blackBanana;
+    //黒バナナポジション初期位置保持用
+    private Vector2 retentionPositionBlackbanana;
+    //黒バナナポジション保持用変数
+    private Vector2 chengingPositionForBlackbanana;
 
     //ゲットしたサルのポジション操作用
     private Transform __getBananaMonkey;
@@ -53,6 +62,9 @@ public class GameController : MonoBehaviour
     //uniTaskキャンセル用トークン生成
     private CancellationTokenSource cts = new CancellationTokenSource();
     private CancellationToken token;
+
+    //光るバナナが黒いバナナになるまでの変数定義
+    private float ToBlackBananaCount = 0f;
 
 
     //初期設定
@@ -79,9 +91,13 @@ public class GameController : MonoBehaviour
         __shinybanana = shinybanana.transform;
         retentionPositionShinybanana = __shinybanana.position;
 
-        //ゲットバナナサルの初期位置取得
+        //ゲットバナナサルの初期値を設定と保持
         __getBananaMonkey = getBananaMonkey.transform;
         retentionPositionGetBananaMonkey = __getBananaMonkey.position;
+
+        //ブラックバナナのを初期値を設定と保持
+        __blackBanana = blackBanana.transform;
+        retentionPositionBlackbanana = __blackBanana.position;
 
         //キャンセルトークン初期化
         token = cts.Token;
@@ -98,7 +114,13 @@ public class GameController : MonoBehaviour
             //光っているバナナ、ゲットバナナサルとが保持用変数が一緒かどうか判定
             if (__shinybanana.position.Equals(retentionPositionShinybanana) && __getBananaMonkey.position.Equals(retentionPositionGetBananaMonkey))
             {
-                    __shinybanana.position = shinybananaCandidatePos;
+                __shinybanana.position = shinybananaCandidatePos;
+                //ブラックバナナが初期位置にいるかどうか
+                if (__blackBanana.position.Equals(retentionPositionBlackbanana))
+                {
+                    //ブラックバナナのポジション設定
+                    chengingPositionForBlackbanana = shinybananaCandidatePos;
+                }
             }
             //光らず死んだバナナの位置をリストに戻す
             else
@@ -106,7 +128,29 @@ public class GameController : MonoBehaviour
                 bananaAprPosList.Add(shinybananaCandidatePos);
             }
         }
-        
+
+        //光っているバナナが存在している時間を計るよ
+        if (!__shinybanana.position.Equals(retentionPositionShinybanana))
+        {
+            //光っているバナナが存在している時間を計るよ
+            ToBlackBananaCount += Time.deltaTime;
+            Debug.Log(ToBlackBananaCount.ToString());
+
+            //黒いバナナになったらゲーム終了！
+            if (ToBlackBananaCount > chengingTimeForBlackBana)
+            {
+                //光るバナナと黒いバナナと位置を入れ替える
+                __blackBanana.position = chengingPositionForBlackbanana;
+
+                //shinybananaを初期位置を入れ替える
+                __shinybanana.position = retentionPositionShinybanana;
+
+                await UniTask.Delay(TimeSpan.FromSeconds(1), cancellationToken: token);
+
+                cts.Cancel();
+                SceneManager.LoadScene("FinishGameScreen");
+            }
+        }
 
         //タップしたゲームオブジェクトを取得する
         if (Input.GetMouseButtonDown(0))
@@ -137,12 +181,13 @@ public class GameController : MonoBehaviour
                     //生成時間変数を0に戻す
                     generationSec =  0;
 
+                    //黒いバナナに変わるまでの時間を0に戻す
+                    ToBlackBananaCount = 0;
+
                     await UniTask.Delay(TimeSpan.FromSeconds(1), cancellationToken: token);
 
                     //ゲットバナナサルを初期位置に戻す
                     __getBananaMonkey.position = retentionPositionGetBananaMonkey;
-
-
                 }
                 else
                 {
