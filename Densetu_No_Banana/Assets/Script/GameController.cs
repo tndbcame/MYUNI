@@ -51,10 +51,13 @@ public class GameController : MonoBehaviour
 
     //ランダムインスタンス生成
     System.Random random = new System.Random();
+
     //光ったバナナをタップしたときのカウント変数
     private int shinybananaCount = 0;
     //始めにバナナが生成されるまでの時間を増やす変数(生成時間変数)
     private int generationSec = 0;
+    //光るバナナが黒いバナナになるまでの変数定義
+    private float ToBlackBananaCount = 0f;
 
     //クリックしたゲームオブジェクト
     private GameObject clickedGameObject;
@@ -63,8 +66,8 @@ public class GameController : MonoBehaviour
     private CancellationTokenSource cts = new CancellationTokenSource();
     private CancellationToken token;
 
-    //光るバナナが黒いバナナになるまでの変数定義
-    private float ToBlackBananaCount = 0f;
+    //アニメーション定義
+    private Animator jampMonkey;
 
 
     //初期設定
@@ -91,9 +94,12 @@ public class GameController : MonoBehaviour
         __shinybanana = shinybanana.transform;
         retentionPositionShinybanana = __shinybanana.position;
 
-        //ゲットバナナサルの初期値を設定と保持
+        //ゲットバナナサルの初期値の設定と保持,Animatorコンポーネントを設定
         __getBananaMonkey = getBananaMonkey.transform;
         retentionPositionGetBananaMonkey = __getBananaMonkey.position;
+        
+        jampMonkey = getBananaMonkey.GetComponent<Animator>();
+        jampMonkey.SetBool("judgeJamp", false);
 
         //ブラックバナナのを初期値を設定と保持
         __blackBanana = blackBanana.transform;
@@ -112,7 +118,7 @@ public class GameController : MonoBehaviour
             Vector2 shinybananaCandidatePos = await BananaLife(min, max);
 
             //光っているバナナ、ゲットバナナサルとが保持用変数が一緒かどうか判定
-            if (__shinybanana.position.Equals(retentionPositionShinybanana) && __getBananaMonkey.position.Equals(retentionPositionGetBananaMonkey))
+            if (__shinybanana.position.Equals(retentionPositionShinybanana) && !jampMonkey.GetBool("judgeJamp"))
             {
                 __shinybanana.position = shinybananaCandidatePos;
                 //ブラックバナナが初期位置にいるかどうか
@@ -166,11 +172,13 @@ public class GameController : MonoBehaviour
                 clickedGameObject = hit2d.transform.gameObject;
                 if(clickedGameObject == shinybanana)
                 {
+                    jampMonkey.SetBool("judgeJamp", true);
                     //光るバナナのタップした回数を数える
                     shinybananaCount += 1;
 
                     //ゲットバナナサルと位置を入れ替える
                     __getBananaMonkey.position = __shinybanana.position;
+                    
 
                     //光っていたバナナの位置をPosリストに戻す
                     bananaAprPosList.Add(__shinybanana.position);
@@ -184,10 +192,11 @@ public class GameController : MonoBehaviour
                     //黒いバナナに変わるまでの時間を0に戻す
                     ToBlackBananaCount = 0;
 
-                    await UniTask.Delay(TimeSpan.FromSeconds(1), cancellationToken: token);
+                    await UniTask.Delay(TimeSpan.FromSeconds(0.5), cancellationToken: token);
 
                     //ゲットバナナサルを初期位置に戻す
                     __getBananaMonkey.position = retentionPositionGetBananaMonkey;
+                    jampMonkey.SetBool("judgeJamp", false);
                 }
                 else
                 {
