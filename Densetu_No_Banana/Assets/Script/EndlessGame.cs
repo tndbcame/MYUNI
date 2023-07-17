@@ -6,8 +6,9 @@ using Cysharp.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
-public class GameController : MonoBehaviour
+public class EndlessGame : MonoBehaviour
 {
     //列挙されたposition
     [SerializeField] private Transform positions;
@@ -26,7 +27,10 @@ public class GameController : MonoBehaviour
     [SerializeField] private int max;
 
     //黒いバナナに変化するまでの時間
-    [SerializeField] private float chengingTimeForBlackBana; 
+    [SerializeField] private float chengingTimeForBlackBana;
+
+    //スコア表示用変数
+    [SerializeField] private Text Score;
 
 
     //バナナの出現ポジションリスト
@@ -175,6 +179,9 @@ public class GameController : MonoBehaviour
                     jampMonkey.SetBool("judgeJamp", true);
                     //光るバナナのタップした回数を数える
                     shinybananaCount += 1;
+
+                    //スコア更新
+                    Score.text = shinybananaCount.ToString();
 
                     //ゲットバナナサルと位置を入れ替える
                     __getBananaMonkey.position = __shinybanana.position;
