@@ -22,6 +22,9 @@ public class EndlessGame : MonoBehaviour
     //バナナをゲットしたときのサル
     [SerializeField] private GameObject getBananaMonkey;
 
+    //木につかまっているサル
+    [SerializeField] private GameObject climbingMonkey;
+
     //何秒に1回バナナを生成する決めるときの変数
     [SerializeField] private int min;
     [SerializeField] private int max;
@@ -52,6 +55,12 @@ public class EndlessGame : MonoBehaviour
     private Transform __getBananaMonkey;
     //ゲットしたサルの初期ポジション
     private Vector3 retentionPositionGetBananaMonkey;
+    //木につかまっているサルのポジション操作用
+    private Transform __climbingMonkey;
+    //木につかまっているサルの初期ポジション
+    private Vector3 retentionPositionClimbingMonkey;
+
+
 
     //ランダムインスタンス生成
     System.Random random = new System.Random();
@@ -101,9 +110,12 @@ public class EndlessGame : MonoBehaviour
         //ゲットバナナサルの初期値の設定と保持,Animatorコンポーネントを設定
         __getBananaMonkey = getBananaMonkey.transform;
         retentionPositionGetBananaMonkey = __getBananaMonkey.position;
-        
         jampMonkey = getBananaMonkey.GetComponent<Animator>();
         jampMonkey.SetBool("judgeJamp", false);
+
+        //木につかまっているサルの初期値の設定と保持
+        __climbingMonkey = climbingMonkey.transform;
+        retentionPositionClimbingMonkey = __climbingMonkey.position;
 
         //ブラックバナナのを初期値を設定と保持
         __blackBanana = blackBanana.transform;
@@ -183,9 +195,11 @@ public class EndlessGame : MonoBehaviour
                     //スコア更新
                     Score.text = shinybananaCount.ToString();
 
-                    //ゲットバナナサルと位置を入れ替える
+                    //ゲットバナナサルと光るバナナの位置を入れ替える
                     __getBananaMonkey.position = __shinybanana.position;
-                    
+
+                    //木につかまっているサルに光るバナナの初期位置にする
+                    __climbingMonkey.position = retentionPositionShinybanana;
 
                     //光っていたバナナの位置をPosリストに戻す
                     bananaAprPosList.Add(__shinybanana.position);
@@ -203,6 +217,8 @@ public class EndlessGame : MonoBehaviour
 
                     //ゲットバナナサルを初期位置に戻す
                     __getBananaMonkey.position = retentionPositionGetBananaMonkey;
+                    //木につかまっているサルを初期位置に戻す
+                    __climbingMonkey.position = retentionPositionClimbingMonkey;
                     jampMonkey.SetBool("judgeJamp", false);
                 }
                 else
