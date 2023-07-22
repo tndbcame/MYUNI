@@ -1,10 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using Cysharp.Threading.Tasks;
 using System.Threading;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -18,28 +17,26 @@ public class EndlessGame : MonoBehaviour
     [SerializeField] private GameObject shinybanana;
     //黒バナナ
     [SerializeField] private GameObject blackBanana;
-
     //バナナをゲットしたときのサル
     [SerializeField] private GameObject getBananaMonkey;
-
     //木につかまっているサル
     [SerializeField] private GameObject climbingMonkey;
-
+    //光ったバナナになってからボタンを押すまでの時間
+    [SerializeField] private GameObject TimeToTap;
     //何秒に1回バナナを生成する決めるときの変数
     [SerializeField] private int min;
     [SerializeField] private int max;
-
     //黒いバナナに変化するまでの時間
     [SerializeField] private float chengingTimeForBlackBana;
-
     //スコア表示用変数
     [SerializeField] private Text Score;
-
+    //初めにバナナが生成されるまでの時間の定数
+    [SerializeField] private float __generationSec;
 
     //バナナの出現ポジションリスト
-    List<Vector2> bananaAprPosList = new List<Vector2>();
+    private List<Vector2> bananaAprPosList = new List<Vector2>();
     //バナナリスト
-    Dictionary<int, GameObject> bananasList = new Dictionary<int, GameObject>();
+    private Dictionary<int, GameObject> bananasList = new Dictionary<int, GameObject>();
     //光るバナナのポジション操作用
     private Transform __shinybanana;
     //光るバナナポジション保持用変数
@@ -50,7 +47,6 @@ public class EndlessGame : MonoBehaviour
     private Vector2 retentionPositionBlackbanana;
     //黒バナナポジション保持用変数
     private Vector2 chengingPositionForBlackbanana;
-
     //ゲットしたサルのポジション操作用
     private Transform __getBananaMonkey;
     //ゲットしたサルの初期ポジション
@@ -59,29 +55,26 @@ public class EndlessGame : MonoBehaviour
     private Transform __climbingMonkey;
     //木につかまっているサルの初期ポジション
     private Vector3 retentionPositionClimbingMonkey;
-
-
+    //ポジション操作用変数
+    private Transform __timeToTap;
 
     //ランダムインスタンス生成
-    System.Random random = new System.Random();
-
+    private System.Random random = new System.Random();
     //光ったバナナをタップしたときのカウント変数
     private int shinybananaCount = 0;
     //始めにバナナが生成されるまでの時間を増やす変数(生成時間変数)
-    private int generationSec = 0;
+    private float generationSec = 0;
     //光るバナナが黒いバナナになるまでの変数定義
     private float ToBlackBananaCount = 0f;
-
     //クリックしたゲームオブジェクト
     private GameObject clickedGameObject;
-
     //uniTaskキャンセル用トークン生成
     private CancellationTokenSource cts = new CancellationTokenSource();
     private CancellationToken token;
-
     //アニメーション定義
     private Animator jampMonkey;
-
+    //光るバナナのインターバルフラグ
+    private bool shinyBananaIntervalflg = true;
 
     //初期設定
     void Start()
@@ -121,6 +114,9 @@ public class EndlessGame : MonoBehaviour
         __blackBanana = blackBanana.transform;
         retentionPositionBlackbanana = __blackBanana.position;
 
+        //タップしたときの時間表示用の位置変数
+        __timeToTap = TimeToTap.transform;
+
         //キャンセルトークン初期化
         token = cts.Token;
     }
@@ -131,11 +127,20 @@ public class EndlessGame : MonoBehaviour
         //バナナを入れ替える用のポジションが存在しているときにバナナ生成するよ
         if (bananaAprPosList?.Count > 0)
         {
+            generationSec += Time.deltaTime;
             Vector2 shinybananaCandidatePos = await BananaLife(min, max);
 
-            //光っているバナナ、ゲットバナナサルとが保持用変数が一緒かどうか判定
-            if (__shinybanana.position.Equals(retentionPositionShinybanana) && !jampMonkey.GetBool("judgeJamp"))
+            //光っているバナナ、ゲットバナナサルとが保持用変数が一緒かどうか,
+            //光るバナナのインターバルフラグがtrueかどうか判定
+            //空のvector2と同じでないかどうか判定
+            if (
+                __shinybanana.position.Equals(retentionPositionShinybanana)
+                && !jampMonkey.GetBool("judgeJamp")
+                && shinyBananaIntervalflg
+                && !shinybananaCandidatePos.Equals(retentionPositionShinybanana)
+               )
             {
+                shinyBananaIntervalflg = false;
                 __shinybanana.position = shinybananaCandidatePos;
                 //ブラックバナナが初期位置にいるかどうか
                 if (__blackBanana.position.Equals(retentionPositionBlackbanana))
@@ -147,7 +152,10 @@ public class EndlessGame : MonoBehaviour
             //光らず死んだバナナの位置をリストに戻す
             else
             {
-                bananaAprPosList.Add(shinybananaCandidatePos);
+                if (!shinybananaCandidatePos.Equals(retentionPositionShinybanana))
+                {
+                    bananaAprPosList.Add(shinybananaCandidatePos);
+                }
             }
         }
 
@@ -188,38 +196,49 @@ public class EndlessGame : MonoBehaviour
                 clickedGameObject = hit2d.transform.gameObject;
                 if(clickedGameObject == shinybanana)
                 {
+                    //サルがjumpするアニメーションをtrueにする
                     jampMonkey.SetBool("judgeJamp", true);
+
                     //光るバナナのタップした回数を数える
                     shinybananaCount += 1;
-
                     //スコア更新
                     Score.text = shinybananaCount.ToString();
 
+                    //光るバナナが出現してからタップするまでの時間
+                    //ToBlackBananaCount *= 100;
+                    TimeToTap.transform.GetChild(0).GetComponent<Text>().text = ToBlackBananaCount.ToString("f3");
+
                     //ゲットバナナサルと光るバナナの位置を入れ替える
                     __getBananaMonkey.position = __shinybanana.position;
+                    //タップしたときの時間表示&アニメーション
+                    __timeToTap.position = __shinybanana.position;
+                    iTween.MoveTo(TimeToTap, getITweenAnimations("UP", __timeToTap, "endTimeToTap"));
 
                     //木につかまっているサルに光るバナナの初期位置にする
                     __climbingMonkey.position = retentionPositionShinybanana;
-
                     //光っていたバナナの位置をPosリストに戻す
                     bananaAprPosList.Add(__shinybanana.position);
-
                     //shinybananaを初期位置を入れ替える
                     __shinybanana.position = retentionPositionShinybanana;
 
                     //生成時間変数を0に戻す
                     generationSec =  0;
-
                     //黒いバナナに変わるまでの時間を0に戻す
                     ToBlackBananaCount = 0;
 
+                    //ゲットバナナサルのジャンプアニメーションの時間待つ
                     await UniTask.Delay(TimeSpan.FromSeconds(0.5), cancellationToken: token);
 
                     //ゲットバナナサルを初期位置に戻す
                     __getBananaMonkey.position = retentionPositionGetBananaMonkey;
                     //木につかまっているサルを初期位置に戻す
                     __climbingMonkey.position = retentionPositionClimbingMonkey;
+                    //サルジャンプアニメーション解除
                     jampMonkey.SetBool("judgeJamp", false);
+
+                    //光るバナナの最低限のインターバル
+                    await UniTask.Delay(TimeSpan.FromSeconds(1), cancellationToken: token);
+                    shinyBananaIntervalflg = true;
                 }
                 else
                 {
@@ -234,49 +253,55 @@ public class EndlessGame : MonoBehaviour
     //バナナの生成〜消滅
     async UniTask<Vector2> BananaLife(int min, int max)
     {
-        //ポジションを保持する
-        Vector2 retentionPosition = get_replace_bananas();
-
-        //始めに生成するバナナを判定
-        bool bananaTransitionCountflg = true;
-
-        generationSec += 1;
-
-        //ループしながら次のバナナへ遷移
-        foreach (int BananaIndex in decide_bananas_to_use(banana_transition_count()))
+        if (generationSec > __generationSec)
         {
-            if (bananaTransitionCountflg)
+            //ポジションを保持する
+            Vector2 retentionPosition = get_replace_bananas();
+            //0に戻す
+            generationSec = 0;
+
+            //始めに生成するバナナを判定
+            bool bananaTransitionCountflg = true;
+
+            //ループしながら次のバナナへ遷移
+            foreach (int BananaIndex in decide_bananas_to_use(banana_transition_count()))
             {
-                await UniTask.Delay(TimeSpan.FromSeconds(generationSec), cancellationToken: token);
+                //バナナのClone生成
+                GameObject BananaClone = (GameObject)Instantiate(bananasList[BananaIndex]);
+                Transform __bananaClone = BananaClone.transform;
+                Debug.Log("バナナを生成しました。");
 
-                //初期生成フラグをfalseにする
-                bananaTransitionCountflg = false; 
+                //ポジションリストからポジションを入れ替える
+                __bananaClone.position = retentionPosition;
+
+                //ランダムに遷移時間を決める
+                int sec = random.Next(min, max);
+
+                if (bananaTransitionCountflg)
+                {
+                    iTween.ShakePosition(BananaClone, getITweenAnimations("SHAKE"));
+                    //初期生成フラグをfalseにする
+                    bananaTransitionCountflg = false;
+                }
+
+                //指定した時間分待つ
+                await UniTask.Delay(TimeSpan.FromSeconds(sec), cancellationToken: token);
+
+                //バナナオブジェクト削除
+                Destroy(BananaClone);
             }
-
-            //バナナのClone生成
-            GameObject BananaClone = (GameObject)Instantiate(bananasList[BananaIndex]);
-            Transform __bananaClone = BananaClone.transform;
-            Debug.Log("バナナを生成しました。");
-
-            //ポジションリストからポジションを入れ替える
-            __bananaClone.position = retentionPosition;
-
-            //ランダムに遷移時間を決める
-            int sec = random.Next(min, max);
-
-            //指定した時間分待つ
-            await UniTask.Delay(TimeSpan.FromSeconds(sec), cancellationToken: token);
-
-            //バナナオブジェクト削除
-            Destroy(BananaClone);
+            return retentionPosition;
         }
-        return retentionPosition;
+        else
+        {
+            return retentionPositionShinybanana;
+        }
     }
 
     //何段階か決める処理
     private int banana_transition_count()
     {
-        int transitionCount = random.Next(0, bananasList.Count);
+        int transitionCount = random.Next(1, bananasList.Count);
         return transitionCount;
     }
 
@@ -310,4 +335,36 @@ public class EndlessGame : MonoBehaviour
 
         return pos;
     }
+
+    //iTweenのアニメーション生成
+    private Hashtable getITweenAnimations(string s, Transform t = null, string met = null)
+    {
+        Hashtable hash = new Hashtable();
+        if (s == "UP")
+        {
+            hash.Add("y", t.position.y + 1f);// 上方向へ0.5f移動する
+            hash.Add("time", 1f);// 1.5秒をかけて移動する
+            hash.Add("oncomplete", met);// 移動完了した時のコールバック
+            hash.Add("oncompletetarget", this.gameObject);
+        }
+        else if(s == "SHAKE")
+        {
+            hash.Add("x", 0.05f);// x軸（横）を0.1の力で振動させる
+            hash.Add("y", 0.05f);// y軸（縦）を0.3の力で振動させる
+            hash.Add("time", 0.5f);// 1秒をかけて
+            hash.Add("oncompletetarget", this.gameObject);
+        }
+        return hash;
+        
+    }
+
+    // タップしてからの時間表示アニメーションが終了した時の処理
+    private void endTimeToTap()
+    {
+        //光るバナナの初期位置に戻す
+        __timeToTap.position = retentionPositionShinybanana;
+    }
+
+
+
 }
