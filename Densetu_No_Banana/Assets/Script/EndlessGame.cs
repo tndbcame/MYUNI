@@ -40,7 +40,7 @@ public class EndlessGame : MonoBehaviour
     //光るバナナのポジション操作用
     private Transform __shinybanana;
     //光るバナナポジション保持用変数
-    private Vector2 retentionPositionShinybanana;
+    private Vector3 retentionPositionShinybanana;
     //ブラックバナナのポジション操作用
     private Transform __blackBanana;
     //黒バナナポジション初期位置保持用
@@ -55,8 +55,10 @@ public class EndlessGame : MonoBehaviour
     private Transform __climbingMonkey;
     //木につかまっているサルの初期ポジション
     private Vector3 retentionPositionClimbingMonkey;
-    //ポジション操作用変数
+    //時間表示のポジション操作用変数
     private Transform __timeToTap;
+    //ボタン押した時の入れ替え用ポジション
+    private Vector3 whenTapBottunPotion;
 
     //ランダムインスタンス生成
     private System.Random random = new System.Random();
@@ -75,6 +77,10 @@ public class EndlessGame : MonoBehaviour
     private Animator jampMonkey;
     //光るバナナのインターバルフラグ
     private bool shinyBananaIntervalflg = true;
+    //ボタンタップをタップしてからフラグ
+    private bool whenTapBottunflg = true;
+
+
 
     //初期設定
     void Start()
@@ -128,7 +134,7 @@ public class EndlessGame : MonoBehaviour
         if (bananaAprPosList?.Count > 0)
         {
             generationSec += Time.deltaTime;
-            Vector2 shinybananaCandidatePos = await BananaLife(min, max);
+            Vector3 shinybananaCandidatePos = await BananaLife(min, max);
 
             //光っているバナナ、ゲットバナナサルとが保持用変数が一緒かどうか,
             //光るバナナのインターバルフラグがtrueかどうか判定
@@ -138,10 +144,12 @@ public class EndlessGame : MonoBehaviour
                 && !jampMonkey.GetBool("judgeJamp")
                 && shinyBananaIntervalflg
                 && !shinybananaCandidatePos.Equals(retentionPositionShinybanana)
+                && whenTapBottunflg
                )
             {
                 shinyBananaIntervalflg = false;
                 __shinybanana.position = shinybananaCandidatePos;
+                whenTapBottunPotion = shinybananaCandidatePos;
                 //ブラックバナナが初期位置にいるかどうか
                 if (__blackBanana.position.Equals(retentionPositionBlackbanana))
                 {
@@ -185,6 +193,7 @@ public class EndlessGame : MonoBehaviour
         //タップしたゲームオブジェクトを取得する
         if (Input.GetMouseButtonDown(0))
         {
+            whenTapBottunflg = false;
             clickedGameObject = null;
 
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -196,22 +205,21 @@ public class EndlessGame : MonoBehaviour
                 clickedGameObject = hit2d.transform.gameObject;
                 if(clickedGameObject == shinybanana)
                 {
-                    //サルがjumpするアニメーションをtrueにする
-                    jampMonkey.SetBool("judgeJamp", true);
-
                     //光るバナナのタップした回数を数える
                     shinybananaCount += 1;
                     //スコア更新
                     Score.text = shinybananaCount.ToString();
 
                     //光るバナナが出現してからタップするまでの時間
-                    //ToBlackBananaCount *= 100;
                     TimeToTap.transform.GetChild(0).GetComponent<Text>().text = ToBlackBananaCount.ToString("f3");
 
                     //ゲットバナナサルと光るバナナの位置を入れ替える
-                    __getBananaMonkey.position = __shinybanana.position;
+                    __getBananaMonkey.position = whenTapBottunPotion;
+                    //サルがjumpするアニメーションをtrueにする
+                    jampMonkey.SetBool("judgeJamp", true);
+
                     //タップしたときの時間表示&アニメーション
-                    __timeToTap.position = __shinybanana.position;
+                    __timeToTap.position = whenTapBottunPotion;
                     iTween.MoveTo(TimeToTap, getITweenAnimations("UP", __timeToTap, "endTimeToTap"));
 
                     //木につかまっているサルに光るバナナの初期位置にする
@@ -238,6 +246,7 @@ public class EndlessGame : MonoBehaviour
 
                     //光るバナナの最低限のインターバル
                     await UniTask.Delay(TimeSpan.FromSeconds(1), cancellationToken: token);
+                    whenTapBottunflg = true;
                     shinyBananaIntervalflg = true;
                 }
                 else
@@ -251,7 +260,7 @@ public class EndlessGame : MonoBehaviour
     }
 
     //バナナの生成〜消滅
-    async UniTask<Vector2> BananaLife(int min, int max)
+    async UniTask<Vector3> BananaLife(int min, int max)
     {
         if (generationSec > __generationSec)
         {
