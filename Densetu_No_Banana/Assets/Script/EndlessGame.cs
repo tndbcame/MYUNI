@@ -147,6 +147,7 @@ public class EndlessGame : MonoBehaviour
                 && whenTapBottunflg
                )
             {
+                Debug.Log("光るバナナを生成しました");
                 shinyBananaIntervalflg = false;
                 __shinybanana.position = shinybananaCandidatePos;
                 whenTapBottunPotion = shinybananaCandidatePos;
@@ -160,7 +161,8 @@ public class EndlessGame : MonoBehaviour
             //光らず死んだバナナの位置をリストに戻す
             else
             {
-                if (!shinybananaCandidatePos.Equals(retentionPositionShinybanana))
+                if (!shinybananaCandidatePos.Equals(retentionPositionShinybanana)
+                    && !shinybananaCandidatePos.Equals(whenTapBottunPotion))
                 {
                     bananaAprPosList.Add(shinybananaCandidatePos);
                 }
@@ -168,11 +170,13 @@ public class EndlessGame : MonoBehaviour
         }
 
         //光っているバナナが存在している時間を計るよ
-        if (!__shinybanana.position.Equals(retentionPositionShinybanana))
+        if (!__shinybanana.position.Equals(retentionPositionShinybanana) && whenTapBottunflg)
         {
             //光っているバナナが存在している時間を計るよ
             ToBlackBananaCount += Time.deltaTime;
             Debug.Log(ToBlackBananaCount.ToString());
+            //光るバナナが出現してからタップするまでの時間
+            TimeToTap.transform.GetChild(0).GetComponent<Text>().text = ToBlackBananaCount.ToString("f3");
 
             //黒いバナナになったらゲーム終了！
             if (ToBlackBananaCount > chengingTimeForBlackBana)
@@ -201,6 +205,7 @@ public class EndlessGame : MonoBehaviour
 
             if (hit2d)
             {
+                Debug.Log("光るバナナをタップしました。");
                 //光るバナナをタップした時の処理
                 clickedGameObject = hit2d.transform.gameObject;
                 if(clickedGameObject == shinybanana)
@@ -209,9 +214,6 @@ public class EndlessGame : MonoBehaviour
                     shinybananaCount += 1;
                     //スコア更新
                     Score.text = shinybananaCount.ToString();
-
-                    //光るバナナが出現してからタップするまでの時間
-                    TimeToTap.transform.GetChild(0).GetComponent<Text>().text = ToBlackBananaCount.ToString("f3");
 
                     //ゲットバナナサルと光るバナナの位置を入れ替える
                     __getBananaMonkey.position = whenTapBottunPotion;
@@ -225,7 +227,7 @@ public class EndlessGame : MonoBehaviour
                     //木につかまっているサルに光るバナナの初期位置にする
                     __climbingMonkey.position = retentionPositionShinybanana;
                     //光っていたバナナの位置をPosリストに戻す
-                    bananaAprPosList.Add(__shinybanana.position);
+                    bananaAprPosList.Add(whenTapBottunPotion);
                     //shinybananaを初期位置を入れ替える
                     __shinybanana.position = retentionPositionShinybanana;
 
