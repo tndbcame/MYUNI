@@ -161,8 +161,7 @@ public class EndlessGame : MonoBehaviour
             //光らず死んだバナナの位置をリストに戻す
             else
             {
-                if (!shinybananaCandidatePos.Equals(retentionPositionShinybanana)
-                    && !shinybananaCandidatePos.Equals(whenTapBottunPotion))
+                if (!shinybananaCandidatePos.Equals(retentionPositionShinybanana))
                 {
                     bananaAprPosList.Add(shinybananaCandidatePos);
                 }
@@ -226,8 +225,13 @@ public class EndlessGame : MonoBehaviour
 
                     //木につかまっているサルに光るバナナの初期位置にする
                     __climbingMonkey.position = retentionPositionShinybanana;
-                    //光っていたバナナの位置をPosリストに戻す
-                    bananaAprPosList.Add(whenTapBottunPotion);
+
+                    //その位置が入っていないかどうか判定してから光っていたバナナの位置をPosリストに戻す
+                    if (!bananaAprPosList.Contains(whenTapBottunPotion))
+                    {
+                        bananaAprPosList.Add(whenTapBottunPotion);
+                    }
+                        
                     //shinybananaを初期位置を入れ替える
                     __shinybanana.position = retentionPositionShinybanana;
 
