@@ -137,14 +137,19 @@ public class EndlessGame : MonoBehaviour
             Vector3 shinybananaCandidatePos = await BananaLife(min, max);
 
             //光っているバナナ、ゲットバナナサルとが保持用変数が一緒かどうか,
-            //光るバナナのインターバルフラグがtrueかどうか判定
-            //空のvector2と同じでないかどうか判定
+            //サルがジャンプしていないかどうか、
+            //光るバナナのインターバルフラグがtrueかどうか、
+            //空のvector2と同じでないかどうか、
+            //タップ処理が行われていないかどうか、
+            //ボス戦フラグが立っていないかどうか判定
             if (
                 __shinybanana.position.Equals(retentionPositionShinybanana)
                 && !jampMonkey.GetBool("judgeJamp")
                 && shinyBananaIntervalflg
                 && !shinybananaCandidatePos.Equals(retentionPositionShinybanana)
                 && whenTapBottunflg
+                && !GameController.bossFlg
+
                )
             {
                 Debug.Log("光るバナナを生成しました");
@@ -189,7 +194,8 @@ public class EndlessGame : MonoBehaviour
                 await UniTask.Delay(TimeSpan.FromSeconds(1), cancellationToken: token);
 
                 cts.Cancel();
-                SceneManager.LoadScene("FinishGameScreen");
+                GameController.gameOverFlg = true;
+                this.gameObject.GetComponent<EndlessGame>().enabled = false;
             }
         }
 
@@ -211,6 +217,12 @@ public class EndlessGame : MonoBehaviour
                 {
                     //光るバナナのタップした回数を数える
                     shinybananaCount += 1;
+
+                    if((shinybananaCount - 9) % 10 == 0)
+                    {
+                        GameController.bossFlg = true;
+                    }
+                    
                     //スコア更新
                     Score.text = shinybananaCount.ToString();
 
@@ -254,11 +266,18 @@ public class EndlessGame : MonoBehaviour
                     await UniTask.Delay(TimeSpan.FromSeconds(1), cancellationToken: token);
                     whenTapBottunflg = true;
                     shinyBananaIntervalflg = true;
+
+                    if (GameController.bossFlg)
+                    {
+                        this.gameObject.GetComponent<EndlessGame>().enabled = false;
+                    }
+                    
                 }
                 else
                 {
                     cts.Cancel();
-                    SceneManager.LoadScene("FinishGameScreen");
+                    GameController.gameOverFlg = true;
+                    this.gameObject.GetComponent<EndlessGame>().enabled = false;
                 }
             }
 
