@@ -6,6 +6,6 @@ public class CalledAfterAnimation : MonoBehaviour
 {
     public void raiseFrg()
     {
-        GameController.gameOverFlg = false;
+        GameController.gameStatus = 0;
     }
 }

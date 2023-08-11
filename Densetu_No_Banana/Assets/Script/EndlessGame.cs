@@ -79,8 +79,17 @@ public class EndlessGame : MonoBehaviour
     private bool shinyBananaIntervalflg = true;
     //ボタンタップをタップしてからフラグ
     private bool whenTapBottunflg = true;
+    //ゲームステータスフラグ
+    private int gameStatusFlg;
 
 
+    void OnEnable()
+    {
+        //1 = エンドレスモード
+        //2 = ボス戦フラグ
+        //3 = ゲームオーバー
+        gameStatusFlg = 1;
+    }
 
     //初期設定
     void Start()
@@ -148,7 +157,7 @@ public class EndlessGame : MonoBehaviour
                 && shinyBananaIntervalflg
                 && !shinybananaCandidatePos.Equals(retentionPositionShinybanana)
                 && whenTapBottunflg
-                && !GameController.bossFlg
+                && !(gameStatusFlg == 2)
 
                )
             {
@@ -194,7 +203,8 @@ public class EndlessGame : MonoBehaviour
                 await UniTask.Delay(TimeSpan.FromSeconds(1), cancellationToken: token);
 
                 cts.Cancel();
-                GameController.gameOverFlg = true;
+                //ゲームオーバー
+                gameStatusFlg = 3;
                 this.gameObject.GetComponent<EndlessGame>().enabled = false;
             }
         }
@@ -218,9 +228,10 @@ public class EndlessGame : MonoBehaviour
                     //光るバナナのタップした回数を数える
                     shinybananaCount += 1;
 
-                    if((shinybananaCount - 9) % 10 == 0)
+                    if((shinybananaCount - 1) % 1 == 0)
                     {
-                        GameController.bossFlg = true;
+                        //bossflg(2)にする
+                        gameStatusFlg = 2;
                     }
                     
                     //スコア更新
@@ -267,7 +278,8 @@ public class EndlessGame : MonoBehaviour
                     whenTapBottunflg = true;
                     shinyBananaIntervalflg = true;
 
-                    if (GameController.bossFlg)
+                    //bossflg(2)のとき
+                    if (gameStatusFlg == 2)
                     {
                         this.gameObject.GetComponent<EndlessGame>().enabled = false;
                     }
@@ -276,11 +288,10 @@ public class EndlessGame : MonoBehaviour
                 else
                 {
                     cts.Cancel();
-                    GameController.gameOverFlg = true;
+                    gameStatusFlg = 3;
                     this.gameObject.GetComponent<EndlessGame>().enabled = false;
                 }
             }
-
         }
     }
 
@@ -318,8 +329,17 @@ public class EndlessGame : MonoBehaviour
                     bananaTransitionCountflg = false;
                 }
 
-                //指定した時間分待つ
-                await UniTask.Delay(TimeSpan.FromSeconds(sec), cancellationToken: token);
+                try
+                {
+                    //指定した時間分待つ
+                    await UniTask.Delay(TimeSpan.FromSeconds(sec), cancellationToken: token);
+                }
+                catch (OperationCanceledException)
+                {
+                    //バナナオブジェクト削除
+                    Destroy(BananaClone);
+                    break;
+                }
 
                 //バナナオブジェクト削除
                 Destroy(BananaClone);
@@ -376,22 +396,20 @@ public class EndlessGame : MonoBehaviour
         Hashtable hash = new Hashtable();
         if (s == "UP")
         {
-            hash.Add("y", t.position.y + 1f);// 上方向へ0.5f移動する
-            hash.Add("time", 1f);// 1.5秒をかけて移動する
+            hash.Add("y", t.position.y + 1f);// 上方向へ移動する
+            hash.Add("time", 1f);
             hash.Add("oncomplete", met);// 移動完了した時のコールバック
             hash.Add("oncompletetarget", this.gameObject);
         }
-        else if(s == "SHAKE")
+        else if (s == "SHAKE")
         {
-            hash.Add("x", 0.05f);// x軸（横）を0.1の力で振動させる
-            hash.Add("y", 0.05f);// y軸（縦）を0.3の力で振動させる
-            hash.Add("time", 0.5f);// 1秒をかけて
+            hash.Add("x", 0.05f);//振動
+            hash.Add("y", 0.05f);//振動
+            hash.Add("time", 0.5f);
             hash.Add("oncompletetarget", this.gameObject);
         }
         return hash;
-        
     }
-
     // タップしてからの時間表示アニメーションが終了した時の処理
     private void endTimeToTap()
     {
@@ -399,6 +417,14 @@ public class EndlessGame : MonoBehaviour
         __timeToTap.position = retentionPositionShinybanana;
     }
 
-
-
+    //EndlessGameがDisableになったときの処理
+    void OnDisable()
+    {
+        cts.Cancel();
+        GameController.gameStatus = gameStatusFlg;
+        //このスクリプトのオブジェクトを削除
+        //Destroy(this.gameObject);
+        //GameController.toEndlessGame = 3;
+        //GameController.exitEndlessGame = true;
+    }
 }
