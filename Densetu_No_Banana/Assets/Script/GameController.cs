@@ -1,16 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameController : MonoBehaviour
 {
     [SerializeField] private GameObject EndlessGame;
     public static int gameStatus = 0;
-    public static int toEndlessGame = 0;
-    //public static int __gameStatus = 0;
+    public static bool toEndless = false;
+    //光ったバナナをタップしたときのカウント変数
+    public static int shinybananaCount = 0;
 
-    public static bool exitEndlessGame = true;
-    private bool waitflg = false;
 
     void Start()
     {
@@ -23,28 +23,6 @@ public class GameController : MonoBehaviour
         {
             case 1:
                 this.gameObject.GetComponent<EndlessGame>().enabled = true;
-                //if (exitEndlessGame)
-                //{
-                //    exitEndlessGame = false;
-                //    GameObject EndlessGameClone = (GameObject)Instantiate(EndlessGame);
-
-                //    //1回目のボス戦以降
-                //    if (toEndlessGame == 2)
-                //    {
-                //        StartCoroutine(StartToWait(5f, EndlessGameClone));
-                //    }
-                //    //1回目
-                //    else if (toEndlessGame == 1)
-                //    {
-                //        EndlessGameClone.GetComponent<EndlessGame>().enabled = true;
-                //    }
-                //    //削除
-                //    //else if (toEndlessGame == 3)
-                //    //{
-                //    //    Destroy(EndlessGameClone);
-                //    //    gameStatus = __gameStatus;
-                //    //}
-                //}
                 break;
 
             case 2:
@@ -54,13 +32,12 @@ public class GameController : MonoBehaviour
             case 3:
                 this.gameObject.GetComponent<GameOver>().enabled = true;
                 break;
+            //一旦シーンをリセット
+            case 4:
+                gameStatus = 0;
+                SceneManager.LoadScene("GameScreen");
+                break;
         }
 
     }
-    //IEnumerator StartToWait(float f, GameObject EndlessGameClone)
-    //{
-    //    yield return new WaitForSeconds(f);
-    //    //this.gameObject.GetComponent<EndlessGame>().enabled = true;
-    //    EndlessGameClone.GetComponent<EndlessGame>().enabled = true;
-    //}
 }

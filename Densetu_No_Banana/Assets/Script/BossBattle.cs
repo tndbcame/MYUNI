@@ -191,6 +191,7 @@ public class BossBattle : MonoBehaviour
 
         if (!GameClearflg)
         {
+            GameController.toEndless = false;
             GameController.gameStatus = 3;
         }
         else
@@ -198,11 +199,9 @@ public class BossBattle : MonoBehaviour
             bigBanana.GetComponent<SpriteRenderer>().enabled = false;
             bigBanana.GetComponent<PolygonCollider2D>().enabled = false;
             HPbar.transform.GetChild(0).GetComponent<Image>().enabled = false;
-            scoreText.enabled = true;
             timeText.enabled = false;
-            GameController.exitEndlessGame = true; 
-            GameController.toEndlessGame = 2;
-            GameController.gameStatus = 1;
+            GameController.toEndless = true;
+            GameController.gameStatus = 4;
         }
         
 

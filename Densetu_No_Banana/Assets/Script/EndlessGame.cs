@@ -62,8 +62,7 @@ public class EndlessGame : MonoBehaviour
 
     //ランダムインスタンス生成
     private System.Random random = new System.Random();
-    //光ったバナナをタップしたときのカウント変数
-    private int shinybananaCount = 0;
+
     //始めにバナナが生成されるまでの時間を増やす変数(生成時間変数)
     private float generationSec = 0;
     //光るバナナが黒いバナナになるまでの変数定義
@@ -94,6 +93,9 @@ public class EndlessGame : MonoBehaviour
     //初期設定
     void Start()
     {
+        //スコアを設定
+        Score.text = GameController.shinybananaCount.ToString();
+
         // bananasの子オブジェクトの数を取得
         int childCount = bananas.transform.childCount;
 
@@ -202,7 +204,6 @@ public class EndlessGame : MonoBehaviour
 
                 await UniTask.Delay(TimeSpan.FromSeconds(1), cancellationToken: token);
 
-                cts.Cancel();
                 //ゲームオーバー
                 gameStatusFlg = 3;
                 this.gameObject.GetComponent<EndlessGame>().enabled = false;
@@ -226,16 +227,16 @@ public class EndlessGame : MonoBehaviour
                 if(clickedGameObject == shinybanana)
                 {
                     //光るバナナのタップした回数を数える
-                    shinybananaCount += 1;
+                    GameController.shinybananaCount += 1;
 
-                    if((shinybananaCount - 1) % 1 == 0)
+                    if((GameController.shinybananaCount - 19) % 20 == 0)
                     {
                         //bossflg(2)にする
                         gameStatusFlg = 2;
                     }
                     
                     //スコア更新
-                    Score.text = shinybananaCount.ToString();
+                    Score.text = GameController.shinybananaCount.ToString();
 
                     //ゲットバナナサルと光るバナナの位置を入れ替える
                     __getBananaMonkey.position = whenTapBottunPotion;
@@ -287,7 +288,6 @@ public class EndlessGame : MonoBehaviour
                 }
                 else
                 {
-                    cts.Cancel();
                     gameStatusFlg = 3;
                     this.gameObject.GetComponent<EndlessGame>().enabled = false;
                 }
@@ -421,10 +421,10 @@ public class EndlessGame : MonoBehaviour
     void OnDisable()
     {
         cts.Cancel();
+        if(gameStatusFlg == 3)
+        {
+            GameController.toEndless = false;
+        }
         GameController.gameStatus = gameStatusFlg;
-        //このスクリプトのオブジェクトを削除
-        //Destroy(this.gameObject);
-        //GameController.toEndlessGame = 3;
-        //GameController.exitEndlessGame = true;
     }
 }

@@ -464,6 +464,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   expand: {fileID: 1217214380}
   scoreText: {fileID: 144743317}
+  Left: {fileID: 2049602674}
+  Right: {fileID: 668085927}
+  Top: {fileID: 829156855}
+  Bottom: {fileID: 1111408466}
+  KirinukiBanana: {fileID: 329256723}
 --- !u!114 &138446186
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -510,10 +515,10 @@ MonoBehaviour:
   climbingMonkey: {fileID: 1148308462}
   TimeToTap: {fileID: 1477061116}
   min: 1
-  max: 10
+  max: 5
   chengingTimeForBlackBana: 2
   Score: {fileID: 144743317}
-  __generationSec: 0.1
+  __generationSec: 0.3
 --- !u!114 &138446189
 MonoBehaviour:
   m_ObjectHideFlags: 0
