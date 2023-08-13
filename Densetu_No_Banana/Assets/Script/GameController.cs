@@ -7,7 +7,7 @@ public class GameController : MonoBehaviour
 {
     [SerializeField] private GameObject EndlessGame;
     public static int gameStatus = 0;
-    public static bool toEndless = false;
+    public static bool notFirstTimeFlg = false;
     //光ったバナナをタップしたときのカウント変数
     public static int shinybananaCount = 0;
 

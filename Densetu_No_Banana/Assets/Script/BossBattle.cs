@@ -25,7 +25,6 @@ public class BossBattle : MonoBehaviour
     //uniTaskキャンセル用トークン生成
     private CancellationTokenSource cts = new CancellationTokenSource();
     private CancellationToken token;
-    private int count;
 
     private int maxHp = 20;
     private float CountDownTime = 5;
@@ -50,7 +49,6 @@ public class BossBattle : MonoBehaviour
 
     async void Start()
     {
-        count = 0;
         GameClearflg = true;
         __explainBossBattle = explainBossBattle.transform;
         explainBossBattle.transform.GetChild(0).GetComponent<Text>().text = "<size=300>5</size>びょういないに"
@@ -191,7 +189,7 @@ public class BossBattle : MonoBehaviour
 
         if (!GameClearflg)
         {
-            GameController.toEndless = false;
+            GameController.notFirstTimeFlg = false;
             GameController.gameStatus = 3;
         }
         else
@@ -200,7 +198,7 @@ public class BossBattle : MonoBehaviour
             bigBanana.GetComponent<PolygonCollider2D>().enabled = false;
             HPbar.transform.GetChild(0).GetComponent<Image>().enabled = false;
             timeText.enabled = false;
-            GameController.toEndless = true;
+            GameController.notFirstTimeFlg = true;
             GameController.gameStatus = 4;
         }
         

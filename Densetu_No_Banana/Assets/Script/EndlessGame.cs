@@ -423,7 +423,7 @@ public class EndlessGame : MonoBehaviour
         cts.Cancel();
         if(gameStatusFlg == 3)
         {
-            GameController.toEndless = false;
+            GameController.notFirstTimeFlg = false;
         }
         GameController.gameStatus = gameStatusFlg;
     }

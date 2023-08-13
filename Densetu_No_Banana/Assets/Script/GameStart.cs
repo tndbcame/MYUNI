@@ -16,30 +16,57 @@ public class GameStart : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        if (!GameController.toEndless)
+        if (MainMenu.GameMode == 0)
         {
-            //ゲーム開始時のアニメーション
-            expand.SetTrigger("startExpand");
-            StartCoroutine(StartToWait(2f));
+            if (!GameController.notFirstTimeFlg)
+            {
+                //ゲーム開始時のアニメーション
+                expand.SetTrigger("startExpand");
+                StartCoroutine(StartToEndless(2f));
+            }
+            else
+            {
+                Left.GetComponent<SpriteRenderer>().enabled = false;
+                Right.GetComponent<SpriteRenderer>().enabled = false;
+                Top.GetComponent<SpriteRenderer>().enabled = false;
+                Bottom.GetComponent<SpriteRenderer>().enabled = false;
+                KirinukiBanana.GetComponent<SpriteRenderer>().enabled = false;
+                StartCoroutine(StartToEndless(0.5f));
+            }
         }
-        else
+        if (MainMenu.GameMode == 1)
         {
-            Left.GetComponent<SpriteRenderer>().enabled = false;
-            Right.GetComponent<SpriteRenderer>().enabled = false;
-            Top.GetComponent<SpriteRenderer>().enabled = false;
-            Bottom.GetComponent<SpriteRenderer>().enabled = false;
-            KirinukiBanana.GetComponent<SpriteRenderer>().enabled = false;
-            StartCoroutine(StartToWait(0.5f));
+            if (!GameController.notFirstTimeFlg)
+            {
+                //ゲーム開始時のアニメーション
+                expand.SetTrigger("startExpand");
+                StartCoroutine(StartToBigBanana(2f));
+            }
+            else
+            {
+                StartCoroutine(StartToBigBanana(0.5f));
+            }
         }
-        
+
+
+
+
 
     }
 
-    IEnumerator StartToWait(float f)
+    IEnumerator StartToEndless(float f)
     {
         yield return new WaitForSeconds(f);
         //エンドレスモードスタート！
         GameController.gameStatus = 1;
+        scoreText.enabled = true;
+    }
+
+    IEnumerator StartToBigBanana(float f)
+    {
+        yield return new WaitForSeconds(f);
+        //エンドレスモードスタート！
+        GameController.gameStatus = 2;
         scoreText.enabled = true;
     }
 }
