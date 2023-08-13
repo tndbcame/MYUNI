@@ -10,8 +10,8 @@ public class FinishScreen : MonoBehaviour
 
     void Start()
     {
-        YourScore.text = string.Format("あなたのスコア\n{0}", GameController.shinybananaCount);
-        GameController.shinybananaCount = 0;
+        YourScore.text = string.Format("あなたのスコア\n{0}", GameController.totalScore);
+        GameController.totalScore = 0;
     }
 
     public void onReStart()
@@ -21,6 +21,7 @@ public class FinishScreen : MonoBehaviour
 
     public void onToMainMenu()
     {
+        MainMenu.GameMode = 0;
         SceneManager.LoadScene("MainMenu");
     }
 }

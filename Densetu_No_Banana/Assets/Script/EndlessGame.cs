@@ -94,7 +94,7 @@ public class EndlessGame : MonoBehaviour
     void Start()
     {
         //スコアを設定
-        Score.text = GameController.shinybananaCount.ToString();
+        Score.text = GameController.totalScore.ToString();
 
         // bananasの子オブジェクトの数を取得
         int childCount = bananas.transform.childCount;
@@ -227,16 +227,16 @@ public class EndlessGame : MonoBehaviour
                 if(clickedGameObject == shinybanana)
                 {
                     //光るバナナのタップした回数を数える
-                    GameController.shinybananaCount += 1;
+                    GameController.totalScore += 1;
 
-                    if((GameController.shinybananaCount - 19) % 20 == 0)
+                    if((GameController.totalScore - 19) % 20 == 0)
                     {
                         //bossflg(2)にする
                         gameStatusFlg = 2;
                     }
                     
                     //スコア更新
-                    Score.text = GameController.shinybananaCount.ToString();
+                    Score.text = GameController.totalScore.ToString();
 
                     //ゲットバナナサルと光るバナナの位置を入れ替える
                     __getBananaMonkey.position = whenTapBottunPotion;

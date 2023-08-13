@@ -8,8 +8,11 @@ public class GameController : MonoBehaviour
     [SerializeField] private GameObject EndlessGame;
     public static int gameStatus = 0;
     public static bool notFirstTimeFlg = false;
-    //光ったバナナをタップしたときのカウント変数
-    public static int shinybananaCount = 0;
+    /*
+     * エンドレスなら光るバナナをタップしたとき
+     * デカバナナモードなら一体倒すごとに
+     */
+    public static int totalScore = 0;
 
 
     void Start()

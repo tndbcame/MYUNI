@@ -1,9 +1,4 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -22,17 +17,12 @@ public class BossBattle : MonoBehaviour
     Transform __explainBossBattle;
     AnimationStep step;
 
-    //uniTaskキャンセル用トークン生成
-    private CancellationTokenSource cts = new CancellationTokenSource();
-    private CancellationToken token;
-
     private int maxHp = 20;
-    private float CountDownTime = 5;
+    private float CountDownTime;
     private float timeLimit = 0;
-    private double __countdown;
     private int HP;
-
     private bool GameClearflg;
+    private Vector2 explainBossBattleInitialPosition;
 
     //クリックしたゲームオブジェクト
     private GameObject clickedGameObject;
@@ -44,24 +34,34 @@ public class BossBattle : MonoBehaviour
         TWO,  
         THREE,
         GameStart,
+        TWO_Wait,
+        THREE_Wait,
     }
 
 
-    async void Start()
+    void Start()
     {
-        GameClearflg = true;
+        
         __explainBossBattle = explainBossBattle.transform;
-        explainBossBattle.transform.GetChild(0).GetComponent<Text>().text = "<size=300>5</size>びょういないに"
-            + "\n<size=300>20</size>かいタップしろ！";
-        await GameStart(0.5f);
+        //ムーブするから最初のポジションを保持する
+        explainBossBattleInitialPosition = __explainBossBattle.position;
+        StartCoroutine(GameStart(0.5f));
     }
-    async UniTask GameStart(float f)
+    IEnumerator GameStart(float f)
     {
+        //ステップ1
         step = AnimationStep.ONE;
-        await UniTask.Delay(TimeSpan.FromSeconds(f), cancellationToken: token);
-        //cts.Cancel();
+        //デカバナナを倒す条件
+        explainBossBattle.transform.GetChild(0).GetComponent<Text>().text = "<size=300>5</size>びょういないに"
+    + "\n<size=300>20</size>かいタップしろ！";
+        //ゲームクリアフラグ
+        GameClearflg = true;
+        yield return new WaitForSeconds(f);
+
+        //デカバナナはっけんenable
         bossAppearance.transform.GetChild(0).GetComponent<Text>().enabled = true;
-        iTween.ScaleFrom(bossAppearance, getITweenAnimations("Expand", null, 0, 1f));
+        //最初のアニメーション
+        iTween.ScaleFrom(bossAppearance, getITweenAnimations("Expand", null, 0.1f, 1f, "OnUpdateValue"));
         Instantiate(startEffect, bossAppearance.transform);
     }
 
@@ -90,7 +90,24 @@ public class BossBattle : MonoBehaviour
                         Debug.Log(HPbar.GetComponent<Slider>().value);
                         if (HPbar.GetComponent<Slider>().value == 0)
                         {
-                            this.gameObject.GetComponent<BossBattle>().enabled = false;
+                            if(MainMenu.GameMode == 1)
+                            {
+
+                                GameController.totalScore　++;
+                                //全部戻してもう一度
+                                bigBanana.GetComponent<SpriteRenderer>().enabled = false;
+                                bigBanana.GetComponent<PolygonCollider2D>().enabled = false;
+                                HPbar.transform.GetChild(0).GetComponent<Image>().enabled = false;
+                                timeText.enabled = false;
+                                scoreText.enabled = true;
+                                scoreText.text = GameController.totalScore.ToString();
+                                //もう一度
+                                StartCoroutine(GameStart(1f));
+                            }
+                            else
+                            {
+                                this.gameObject.GetComponent<BossBattle>().enabled = false;
+                            }
                         }
                     }
 
@@ -116,17 +133,20 @@ public class BossBattle : MonoBehaviour
         }
         else if(step == AnimationStep.TWO && Input.GetMouseButtonDown(0))
         {
+            //一回のループで一回まで押せるする
+            step = AnimationStep.TWO_Wait;
             bossAppearance.transform.GetChild(0).GetComponent<Text>().enabled = false;
-            iTween.MoveTo(explainBossBattle, getITweenAnimations("updateY", __explainBossBattle, 6f));
+            iTween.MoveTo(explainBossBattle, getITweenAnimations("updateY", __explainBossBattle, 6f, 0, "OnUpdateValue"));
         }
         else if (step == AnimationStep.THREE && Input.GetMouseButtonDown(0))
         {
-            iTween.MoveTo(explainBossBattle, getITweenAnimations("updateY", __explainBossBattle, 8f));
-
+            //一回のループで一回まで押せるする
+            step = AnimationStep.THREE_Wait;
+            iTween.MoveTo(explainBossBattle, getITweenAnimations("updateY", __explainBossBattle, 8f, 0, "OnUpdatePosition"));
             //大きなバナナ出現
             bigBanana.GetComponent<SpriteRenderer>().enabled = true;
             bigBanana.GetComponent<PolygonCollider2D>().enabled = true;
-            iTween.ScaleFrom(bigBanana, getITweenAnimations("Expand", null, 0, 2f));
+            iTween.ScaleFrom(bigBanana, getITweenAnimations("Expand", null, 0.1f, 2f, "OnUpdateValue"));
             //HPバーの設定
             HPbar.GetComponent<Slider>().value = 1;
             HPbar.transform.GetChild(0).GetComponent<Image>().enabled = true;
@@ -137,28 +157,29 @@ public class BossBattle : MonoBehaviour
             timeText.enabled = true;
 
             HP = maxHp;
+            CountDownTime = 5;
         }
         
     }
 
-    private Hashtable getITweenAnimations(string s, Transform t = null, float f = 0, float f2 = 0)
+    private Hashtable getITweenAnimations(string s, Transform t = null, float f = 0, float f2 = 0, string met = null)
     {
         Hashtable hash = new Hashtable();
 
         switch (s)
         {
             case "Expand":
-                hash.Add("x", 0.1f);
-                hash.Add("y", 0.1f);
+                hash.Add("x", f);
+                hash.Add("y", f);
                 hash.Add("time", f2);
-                hash.Add("oncomplete", "OnUpdateValue");
+                hash.Add("oncomplete", met);
                 hash.Add("oncompletetarget", this.gameObject);
                 break;
 
             case "updateY":
                 hash.Add("y", t.position.y + f);
                 hash.Add("time", 1f);
-                hash.Add("oncomplete", "OnUpdateValue");
+                hash.Add("oncomplete", met);
                 hash.Add("oncompletetarget", this.gameObject);
                 hash.Add("easeType", "easeOutQuad");
                 break;
@@ -175,15 +196,20 @@ public class BossBattle : MonoBehaviour
                 step = AnimationStep.TWO;
                 break;
 
-            case AnimationStep.TWO:
+            case AnimationStep.TWO_Wait:
                 step = AnimationStep.THREE;
                 break;
 
-            case AnimationStep.THREE:
+            case AnimationStep.THREE_Wait:
                 step = AnimationStep.GameStart;
                 break;
         }
     }
+    void OnUpdatePosition()
+    {
+        __explainBossBattle.position = explainBossBattleInitialPosition;
+    }
+
     void OnDisable()
     {
 
