@@ -7,11 +7,15 @@ public class GameStart : MonoBehaviour
 {
     [SerializeField] private Animator expand;
     [SerializeField] private Text scoreText;
+
     [SerializeField] private GameObject Left;
     [SerializeField] private GameObject Right;
     [SerializeField] private GameObject Top;
     [SerializeField] private GameObject Bottom;
     [SerializeField] private GameObject KirinukiBanana;
+
+    [SerializeField] private Text banaPowerText;
+    [SerializeField] private Image bana;
 
     // Start is called before the first frame update
     void Start()
@@ -60,6 +64,8 @@ public class GameStart : MonoBehaviour
         //エンドレスモードスタート！
         GameController.gameStatus = 1;
         scoreText.enabled = true;
+        banaPowerText.enabled = true;
+        bana.enabled = true;
     }
 
     IEnumerator StartToBigBanana(float f)

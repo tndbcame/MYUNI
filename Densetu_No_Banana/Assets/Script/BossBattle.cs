@@ -10,10 +10,14 @@ public class BossBattle : MonoBehaviour
     //ParticleSystem
     [SerializeField] private GameObject startEffect;
 
-
     [SerializeField] private GameObject HPbar;
     [SerializeField] private Text scoreText;
     [SerializeField] private Text timeText;
+
+    [SerializeField] private Text banaPowerText;
+    [SerializeField] private Image bana;
+
+
     Transform __explainBossBattle;
     AnimationStep step;
 
@@ -152,7 +156,8 @@ public class BossBattle : MonoBehaviour
             HPbar.transform.GetChild(0).GetComponent<Image>().enabled = true;
             HPbar.transform.GetChild(1).transform.GetChild(0).GetComponent<Image>().enabled = true;
 
-
+            banaPowerText.enabled = false;
+            bana.enabled = false;
             scoreText.enabled = false;
             timeText.enabled = true;
 

@@ -32,6 +32,8 @@ public class EndlessGame : MonoBehaviour
     [SerializeField] private Text Score;
     //初めにバナナが生成されるまでの時間の定数
     [SerializeField] private float __generationSec;
+    //バナパワー更新用テキスト
+    [SerializeField] private Text banaPowerText;
 
     //バナナの出現ポジションリスト
     private List<Vector2> bananaAprPosList = new List<Vector2>();
@@ -80,19 +82,21 @@ public class EndlessGame : MonoBehaviour
     private bool whenTapBottunflg = true;
     //ゲームステータスフラグ
     private int gameStatusFlg;
+    //バナパワーのカウント
+    private int banaCount;
 
-
-    void OnEnable()
+    //初期設定
+    void Start()
     {
         //1 = エンドレスモード
         //2 = ボス戦フラグ
         //3 = ゲームオーバー
         gameStatusFlg = 1;
-    }
 
-    //初期設定
-    void Start()
-    {
+        //バナパワー初期化
+        banaPowerText.text = "0";
+        banaCount = 0;
+
         //スコアを設定
         Score.text = GameController.totalScore.ToString();
 
@@ -246,6 +250,10 @@ public class EndlessGame : MonoBehaviour
                     //タップしたときの時間表示&アニメーション
                     __timeToTap.position = whenTapBottunPotion;
                     iTween.MoveTo(TimeToTap, getITweenAnimations("UP", __timeToTap, "endTimeToTap"));
+
+                    //バナパワー更新
+                    banaCount += calculateBanaPower(TimeToTap.transform.GetChild(0).GetComponent<Text>().text);
+                    banaPowerText.text = banaCount.ToString();
 
                     //木につかまっているサルに光るバナナの初期位置にする
                     __climbingMonkey.position = retentionPositionShinybanana;
@@ -415,6 +423,25 @@ public class EndlessGame : MonoBehaviour
     {
         //光るバナナの初期位置に戻す
         __timeToTap.position = retentionPositionShinybanana;
+    }
+
+    //バナパワー計算
+    private int calculateBanaPower(string TimeToTap)
+    {
+        double bp = double.Parse(TimeToTap);
+        if(bp >= 0.7)
+        {
+            return 1;
+        }
+        else if(bp < 0.7)
+        {
+            return 2;
+        }
+        else if(bp < 0.5)
+        {
+            return 3;
+        }
+        return 1;
     }
 
     //EndlessGameがDisableになったときの処理
