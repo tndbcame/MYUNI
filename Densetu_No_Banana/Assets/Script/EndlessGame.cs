@@ -429,15 +429,18 @@ public class EndlessGame : MonoBehaviour
     private int calculateBanaPower(string TimeToTap)
     {
         double bp = double.Parse(TimeToTap);
+        //0.7以降は1
         if(bp >= 0.7)
         {
             return 1;
         }
-        else if(bp < 0.7)
+        //0.7未満0.5以上は2
+        else if (bp < 0.7)
         {
             return 2;
         }
-        else if(bp < 0.5)
+        //0.5未満3
+        else if (bp < 0.5)
         {
             return 3;
         }

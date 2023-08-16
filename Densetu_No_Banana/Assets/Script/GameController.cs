@@ -5,7 +5,6 @@ using UnityEngine.SceneManagement;
 
 public class GameController : MonoBehaviour
 {
-    [SerializeField] private GameObject EndlessGame;
     public static int gameStatus = 0;
     public static bool notFirstTimeFlg = false;
     /*

@@ -21,7 +21,7 @@ public class BossBattle : MonoBehaviour
     Transform __explainBossBattle;
     AnimationStep step;
 
-    private int maxHp = 20;
+    private int maxHp = 50;
     private float CountDownTime;
     private float timeLimit = 0;
     private int HP;
@@ -37,9 +37,11 @@ public class BossBattle : MonoBehaviour
         ONE,    
         TWO,  
         THREE,
+        FOUR,
         GameStart,
         TWO_Wait,
         THREE_Wait,
+        FOUR_Wait,
     }
 
 
@@ -137,14 +139,14 @@ public class BossBattle : MonoBehaviour
         }
         else if(step == AnimationStep.TWO && Input.GetMouseButtonDown(0))
         {
-            //一回のループで一回まで押せるする
+            //一回のループで一回まで押せるようにする
             step = AnimationStep.TWO_Wait;
             bossAppearance.transform.GetChild(0).GetComponent<Text>().enabled = false;
             iTween.MoveTo(explainBossBattle, getITweenAnimations("updateY", __explainBossBattle, 6f, 0, "OnUpdateValue"));
         }
         else if (step == AnimationStep.THREE && Input.GetMouseButtonDown(0))
         {
-            //一回のループで一回まで押せるする
+            //一回のループで一回まで押せるようにする
             step = AnimationStep.THREE_Wait;
             iTween.MoveTo(explainBossBattle, getITweenAnimations("updateY", __explainBossBattle, 8f, 0, "OnUpdatePosition"));
             //大きなバナナ出現
@@ -155,16 +157,31 @@ public class BossBattle : MonoBehaviour
             HPbar.GetComponent<Slider>().value = 1;
             HPbar.transform.GetChild(0).GetComponent<Image>().enabled = true;
             HPbar.transform.GetChild(1).transform.GetChild(0).GetComponent<Image>().enabled = true;
-
-            banaPowerText.enabled = false;
-            bana.enabled = false;
             scoreText.enabled = false;
             timeText.enabled = true;
 
             HP = maxHp;
             CountDownTime = 5;
         }
-        
+        else if (step == AnimationStep.FOUR)
+        {
+            //アニメーションを終わるまで待つ
+            step = AnimationStep.FOUR_Wait;
+
+            if(int.Parse(banaPowerText.text) == 0)
+            {
+                banaPowerText.enabled = false;
+                bana.enabled = false;
+                step = AnimationStep.GameStart;
+            }
+            else
+            {
+                iTween.ShakePosition(bigBanana, getITweenAnimations("SHAKE", null, 0, 0, "DecreaseHP"));
+            }
+
+        }
+
+
     }
 
     private Hashtable getITweenAnimations(string s, Transform t = null, float f = 0, float f2 = 0, string met = null)
@@ -188,6 +205,14 @@ public class BossBattle : MonoBehaviour
                 hash.Add("oncompletetarget", this.gameObject);
                 hash.Add("easeType", "easeOutQuad");
                 break;
+
+            case "SHAKE":
+                hash.Add("x", 0.05f);//振動
+                hash.Add("y", 0.05f);//振動
+                hash.Add("time", 0.1f);
+                hash.Add("oncomplete", met);
+                hash.Add("oncompletetarget", this.gameObject);
+                break;
         }
 
         return hash;
@@ -206,13 +231,31 @@ public class BossBattle : MonoBehaviour
                 break;
 
             case AnimationStep.THREE_Wait:
-                step = AnimationStep.GameStart;
+                if(MainMenu.GameMode == 0)
+                {
+                    step = AnimationStep.FOUR;
+                }
+                else
+                {
+                    step = AnimationStep.GameStart;
+                }
                 break;
         }
     }
+
     void OnUpdatePosition()
     {
         __explainBossBattle.position = explainBossBattleInitialPosition;
+    }
+
+    void DecreaseHP()
+    {
+        HP = HP - 1;
+        HPbar.GetComponent<Slider>().value = (float)HP / (float)maxHp;
+        int i = int.Parse(banaPowerText.text);
+        i--;
+        banaPowerText.text = i.ToString();
+        step = AnimationStep.FOUR;
     }
 
     void OnDisable()
