@@ -42,6 +42,7 @@ public class BossBattle : MonoBehaviour
         TWO_Wait,
         THREE_Wait,
         FOUR_Wait,
+        GameFinish,
     }
 
 
@@ -75,61 +76,16 @@ public class BossBattle : MonoBehaviour
     {
         if(step == AnimationStep.GameStart)
         {
-            if (Input.GetMouseButtonDown(0))
-            {
-                clickedGameObject = null;
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                RaycastHit2D hit2d = Physics2D.Raycast((Vector2)ray.origin, (Vector2)ray.direction);
-                if (hit2d)
-                {
-                    clickedGameObject = hit2d.transform.gameObject;
-                    if (clickedGameObject == bigBanana)
-                    {
-                        //タップしたら1引く
-                        if (!(HP == 0))
-                        {
-                            HP = HP - 1;
-                        }
-
-                        //HPバーに反映。
-                        HPbar.GetComponent<Slider>().value = (float)HP / (float)maxHp; ;
-                        Debug.Log(HPbar.GetComponent<Slider>().value);
-                        if (HPbar.GetComponent<Slider>().value == 0)
-                        {
-                            if(MainMenu.GameMode == 1)
-                            {
-
-                                GameController.totalScore　++;
-                                //全部戻してもう一度
-                                bigBanana.GetComponent<SpriteRenderer>().enabled = false;
-                                bigBanana.GetComponent<PolygonCollider2D>().enabled = false;
-                                HPbar.transform.GetChild(0).GetComponent<Image>().enabled = false;
-                                timeText.enabled = false;
-                                scoreText.enabled = true;
-                                scoreText.text = GameController.totalScore.ToString();
-                                //もう一度
-                                StartCoroutine(GameStart(1f));
-                            }
-                            else
-                            {
-                                this.gameObject.GetComponent<BossBattle>().enabled = false;
-                            }
-                        }
-                    }
-
-
-                }
-            }
-
             if (!(HP <= 0) || GameClearflg)
             {
                 CountDownTime -= Time.deltaTime;
                 // カウントダウンタイムを整形して表示
                 timeText.text = CountDownTime.ToString("F");
                 
-                Debug.Log(CountDownTime);
+                //Debug.Log(CountDownTime);
                 if (CountDownTime <= timeLimit)
                 {
+                    step = AnimationStep.GameFinish;
                     GameClearflg = false;
                     timeText.text = "0.00";
                     this.gameObject.GetComponent<BossBattle>().enabled = false;
@@ -256,6 +212,45 @@ public class BossBattle : MonoBehaviour
         i--;
         banaPowerText.text = i.ToString();
         step = AnimationStep.FOUR;
+    }
+
+    public void ClickBigBanana()
+    {
+        if (step == AnimationStep.GameStart)
+        {
+            if (!(HP == 0))
+            {
+                HP = HP - 1;
+            }
+
+            //HPバーに反映。
+            HPbar.GetComponent<Slider>().value = (float)HP / (float)maxHp; ;
+            Debug.Log(HPbar.GetComponent<Slider>().value);
+
+            //ボスバナナを倒した時の処理
+            if (HPbar.GetComponent<Slider>().value == 0)
+            {
+                step = AnimationStep.GameFinish;
+                if (MainMenu.GameMode == 1)
+                {
+
+                    GameController.totalScore++;
+                    //全部戻してもう一度
+                    bigBanana.GetComponent<SpriteRenderer>().enabled = false;
+                    bigBanana.GetComponent<PolygonCollider2D>().enabled = false;
+                    HPbar.transform.GetChild(0).GetComponent<Image>().enabled = false;
+                    timeText.enabled = false;
+                    scoreText.enabled = true;
+                    scoreText.text = GameController.totalScore.ToString();
+                    //もう一度
+                    StartCoroutine(GameStart(1f));
+                }
+                else
+                {
+                    this.gameObject.GetComponent<BossBattle>().enabled = false;
+                }
+            }
+        }
     }
 
     void OnDisable()
