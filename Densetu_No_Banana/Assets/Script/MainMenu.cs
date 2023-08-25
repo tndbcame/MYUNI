@@ -24,6 +24,9 @@ public class MainMenu : MonoBehaviour
      * 1:デカバナナ
      */
     public static int GameMode = 0;
+
+    //こいつがonのときだけゲームを切り替えられるよ
+    private bool swichGameflg = true;
     private void Start()
     {
         __bananaLabel = bananaLabel.GetComponent<Image>();
@@ -34,24 +37,29 @@ public class MainMenu : MonoBehaviour
     //ゲームモードの切り替え
     public void onSwichGameMode()
     {
-        if (GameMode == 0)
+        if (swichGameflg)
         {
-            __bananaLabel.sprite = bananaLabel2;
-            bananaLabelText.text = "でかばなな"; 
-            GameMode = 1;
+            if (GameMode == 0)
+            {
+                __bananaLabel.sprite = bananaLabel2;
+                bananaLabelText.text = "でかばなな";
+                GameMode = 1;
+            }
+            else if (GameMode == 1)
+            {
+                __bananaLabel.sprite = bananaLabel1;
+                bananaLabelText.text = "えんどれす";
+                GameMode = 0;
+            }
         }
-        else if(GameMode == 1)
-        {
-            __bananaLabel.sprite = bananaLabel1;
-            bananaLabelText.text = "えんどれす";
-            GameMode = 0;
-        }
+
     }
 
     //ゲームスタート
     public void onStartEndlessGame()
     {
-        if(GameMode == 0)
+        swichGameflg = false;
+        if (GameMode == 0)
         {
             StartCoroutine(StartEndlessGame());
         }

@@ -6,6 +6,7 @@ public class BossBattle : MonoBehaviour
 {
     [SerializeField] private GameObject bigBanana;
     [SerializeField] private GameObject explainBossBattle;
+    [SerializeField] private GameObject BanaPowerBonus;
     [SerializeField] private GameObject bossAppearance;
     //ParticleSystem
     [SerializeField] private GameObject startEffect;
@@ -19,6 +20,7 @@ public class BossBattle : MonoBehaviour
 
 
     Transform __explainBossBattle;
+    Transform __BanaPowerBonus;
     AnimationStep step;
 
     private int maxHp = 50;
@@ -27,9 +29,17 @@ public class BossBattle : MonoBehaviour
     private int HP;
     private bool GameClearflg;
     private Vector2 explainBossBattleInitialPosition;
+    private Vector2 BanaPowerBonusInitialPosition;
+    private float MonitoringBananaHP;
+    //バナナのHPの最初の一回を判定するフラグ
+    private bool MonitoringBananaHPflg = false;
 
-    //クリックしたゲームオブジェクト
-    private GameObject clickedGameObject;
+    private SpriteRenderer __bigBanana;
+    private Sprite bigbanana1;
+    [SerializeField] private Sprite bigbanana2;
+    [SerializeField] private Sprite bigbanana3;
+    [SerializeField] private Sprite bigbanana4;
+
 
 
     public enum AnimationStep
@@ -38,6 +48,8 @@ public class BossBattle : MonoBehaviour
         TWO,  
         THREE,
         FOUR,
+        BanaPower,
+        BanaPower_Wait,
         GameStart,
         TWO_Wait,
         THREE_Wait,
@@ -48,19 +60,28 @@ public class BossBattle : MonoBehaviour
 
     void Start()
     {
-        
+        //デカバナナ変更用変数
+        __bigBanana = bigBanana.GetComponent<SpriteRenderer>();
+        //一番最初のバナナ
+        bigbanana1 = __bigBanana.sprite;
+        //説明
         __explainBossBattle = explainBossBattle.transform;
+        //バナパワーのテキスト表示用
+        __BanaPowerBonus = BanaPowerBonus.transform;
         //ムーブするから最初のポジションを保持する
         explainBossBattleInitialPosition = __explainBossBattle.position;
+        BanaPowerBonusInitialPosition = __BanaPowerBonus.position;
         StartCoroutine(GameStart(0.5f));
     }
     IEnumerator GameStart(float f)
     {
         //ステップ1
         step = AnimationStep.ONE;
+        //木につかまっているサルがある時はこれをtrueにするよ
+        GameOver.StartFinishAnimeflg = true;
         //デカバナナを倒す条件
-        explainBossBattle.transform.GetChild(0).GetComponent<Text>().text = "<size=300>5</size>びょういないに"
-    + "\n<size=300>20</size>かいタップしろ！";
+        explainBossBattle.transform.GetChild(0).GetComponent<Text>().text = "<size=250>タップ</size>して"
+    + "\n<size=250>でかばなな</size>をたべろ！";
         //ゲームクリアフラグ
         GameClearflg = true;
         yield return new WaitForSeconds(f);
@@ -98,13 +119,13 @@ public class BossBattle : MonoBehaviour
             //一回のループで一回まで押せるようにする
             step = AnimationStep.TWO_Wait;
             bossAppearance.transform.GetChild(0).GetComponent<Text>().enabled = false;
-            iTween.MoveTo(explainBossBattle, getITweenAnimations("updateY", __explainBossBattle, 6f, 0, "OnUpdateValue"));
+            iTween.MoveTo(explainBossBattle, getITweenAnimations("updateY", __explainBossBattle, 6f, 1f, "OnUpdateValue"));
         }
         else if (step == AnimationStep.THREE && Input.GetMouseButtonDown(0))
         {
             //一回のループで一回まで押せるようにする
             step = AnimationStep.THREE_Wait;
-            iTween.MoveTo(explainBossBattle, getITweenAnimations("updateY", __explainBossBattle, 8f, 0, "OnUpdatePosition"));
+            iTween.MoveTo(explainBossBattle, getITweenAnimations("updateY", __explainBossBattle, 8f, 1f, "OnUpdatePosition"));
             //大きなバナナ出現
             bigBanana.GetComponent<SpriteRenderer>().enabled = true;
             bigBanana.GetComponent<PolygonCollider2D>().enabled = true;
@@ -136,6 +157,11 @@ public class BossBattle : MonoBehaviour
             }
 
         }
+        else if(step == AnimationStep.BanaPower)
+        {
+            step = AnimationStep.BanaPower_Wait;
+            iTween.MoveTo(BanaPowerBonus, getITweenAnimations("updateY", __BanaPowerBonus, 16f, 3f, "OnUpdateValue"));
+        }
 
 
     }
@@ -156,7 +182,7 @@ public class BossBattle : MonoBehaviour
 
             case "updateY":
                 hash.Add("y", t.position.y + f);
-                hash.Add("time", 1f);
+                hash.Add("time", f2);
                 hash.Add("oncomplete", met);
                 hash.Add("oncompletetarget", this.gameObject);
                 hash.Add("easeType", "easeOutQuad");
@@ -189,18 +215,25 @@ public class BossBattle : MonoBehaviour
             case AnimationStep.THREE_Wait:
                 if(MainMenu.GameMode == 0)
                 {
-                    step = AnimationStep.FOUR;
+                    step = AnimationStep.BanaPower;
                 }
                 else
                 {
                     step = AnimationStep.GameStart;
                 }
                 break;
+
+            case AnimationStep.BanaPower_Wait:
+                //バナパワーボーナス初期位置に戻す
+                __BanaPowerBonus.position = BanaPowerBonusInitialPosition;
+                step = AnimationStep.FOUR;
+                break;
         }
     }
 
     void OnUpdatePosition()
     {
+        //タップの説明ポジション初期位置に戻す
         __explainBossBattle.position = explainBossBattleInitialPosition;
     }
 
@@ -225,36 +258,64 @@ public class BossBattle : MonoBehaviour
 
             //HPバーに反映。
             HPbar.GetComponent<Slider>().value = (float)HP / (float)maxHp; ;
+            if (!MonitoringBananaHPflg)
+            {
+                MonitoringBananaHPflg = true;
+                //ここでバナナ監視変数初期化
+                MonitoringBananaHP = HPbar.GetComponent<Slider>().value;
+            }
+
+            if (HPbar.GetComponent<Slider>().value < (MonitoringBananaHP * 1 / 3))
+            {
+                __bigBanana.sprite = bigbanana3;
+                
+            }
+            else if(HPbar.GetComponent<Slider>().value < (MonitoringBananaHP * 2 / 3))
+            {
+                __bigBanana.sprite = bigbanana2;
+                GameOver.StartFinishAnimeflg = false;
+            }
             Debug.Log(HPbar.GetComponent<Slider>().value);
 
             //ボスバナナを倒した時の処理
             if (HPbar.GetComponent<Slider>().value == 0)
             {
+                __bigBanana.sprite = bigbanana4;
                 step = AnimationStep.GameFinish;
-                if (MainMenu.GameMode == 1)
-                {
-
-                    GameController.totalScore++;
-                    //全部戻してもう一度
-                    bigBanana.GetComponent<SpriteRenderer>().enabled = false;
-                    bigBanana.GetComponent<PolygonCollider2D>().enabled = false;
-                    HPbar.transform.GetChild(0).GetComponent<Image>().enabled = false;
-                    timeText.enabled = false;
-                    scoreText.enabled = true;
-                    scoreText.text = GameController.totalScore.ToString();
-                    //もう一度
-                    StartCoroutine(GameStart(1f));
-                }
-                else
-                {
-                    this.gameObject.GetComponent<BossBattle>().enabled = false;
-                }
+                StartCoroutine(WaitWhenGameEnd(1f));
             }
+        }
+    }
+
+    IEnumerator WaitWhenGameEnd(float f)
+    {
+        yield return new WaitForSeconds(f);
+        GameController.totalScore++;
+
+        if (MainMenu.GameMode == 1)
+        {
+
+            
+            //全部戻してもう一度
+            bigBanana.GetComponent<SpriteRenderer>().enabled = false;
+            bigBanana.GetComponent<PolygonCollider2D>().enabled = false;
+            HPbar.transform.GetChild(0).GetComponent<Image>().enabled = false;
+            timeText.enabled = false;
+            scoreText.enabled = true;
+            scoreText.text = GameController.totalScore.ToString();
+            //もう一度
+            StartCoroutine(GameStart(1f));
+        }
+        else
+        {
+            this.gameObject.GetComponent<BossBattle>().enabled = false;
         }
     }
 
     void OnDisable()
     {
+        //木につかまっているサルがある時はこれをtrueにするよ
+        GameOver.StartFinishAnimeflg = true;
 
         if (!GameClearflg)
         {
