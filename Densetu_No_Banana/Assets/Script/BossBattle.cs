@@ -8,6 +8,7 @@ public class BossBattle : MonoBehaviour
     [SerializeField] private GameObject explainBossBattle;
     [SerializeField] private GameObject BanaPowerBonus;
     [SerializeField] private GameObject bossAppearance;
+    [SerializeField] private GameObject gameStartText;
     //ParticleSystem
     [SerializeField] private GameObject startEffect;
 
@@ -18,12 +19,14 @@ public class BossBattle : MonoBehaviour
     [SerializeField] private Text banaPowerText;
     [SerializeField] private Image bana;
 
+    //ランダムインスタンス生成
+    private System.Random random = new System.Random();
 
     Transform __explainBossBattle;
     Transform __BanaPowerBonus;
     AnimationStep step;
 
-    private int maxHp = 50;
+    private int maxHp;
     private float CountDownTime;
     private float timeLimit = 0;
     private int HP;
@@ -48,12 +51,14 @@ public class BossBattle : MonoBehaviour
         TWO,  
         THREE,
         FOUR,
+        FIVE,
         BanaPower,
         BanaPower_Wait,
         GameStart,
         TWO_Wait,
         THREE_Wait,
         FOUR_Wait,
+        FIVE_Wait,
         GameFinish,
     }
 
@@ -79,8 +84,10 @@ public class BossBattle : MonoBehaviour
         step = AnimationStep.ONE;
         //木につかまっているサルがある時はこれをtrueにするよ
         GameOver.StartFinishAnimeflg = true;
+        //ここでスプライトを初期化するよ
+        __bigBanana.sprite = bigbanana1;
         //デカバナナを倒す条件
-        explainBossBattle.transform.GetChild(0).GetComponent<Text>().text = "<size=250>タップ</size>して"
+        explainBossBattle.transform.GetChild(0).GetComponent<Text>().text = "<size=250>れんだ</size>して"
     + "\n<size=250>でかばなな</size>をたべろ！";
         //ゲームクリアフラグ
         GameClearflg = true;
@@ -97,6 +104,9 @@ public class BossBattle : MonoBehaviour
     {
         if(step == AnimationStep.GameStart)
         {
+            //ゲームスタートテキスト非アクティブにする
+            gameStartText.transform.GetChild(0).GetComponent<Text>().enabled = false;
+
             if (!(HP <= 0) || GameClearflg)
             {
                 CountDownTime -= Time.deltaTime;
@@ -137,8 +147,9 @@ public class BossBattle : MonoBehaviour
             scoreText.enabled = false;
             timeText.enabled = true;
 
+            //ここでmaxHPと秒数を設定
+            ChengeDifficultyLevel();
             HP = maxHp;
-            CountDownTime = 5;
         }
         else if (step == AnimationStep.FOUR)
         {
@@ -149,13 +160,19 @@ public class BossBattle : MonoBehaviour
             {
                 banaPowerText.enabled = false;
                 bana.enabled = false;
-                step = AnimationStep.GameStart;
+                step = AnimationStep.FIVE;
             }
             else
             {
                 iTween.ShakePosition(bigBanana, getITweenAnimations("SHAKE", null, 0, 0, "DecreaseHP"));
             }
 
+        }
+        else if (step == AnimationStep.FIVE)
+        {
+            step = AnimationStep.FIVE_Wait;
+            gameStartText.transform.GetChild(0).GetComponent<Text>().enabled = true;
+            iTween.ScaleFrom(gameStartText, getITweenAnimations("Expand", null, 0.1f, 2f, "OnUpdateValue"));
         }
         else if(step == AnimationStep.BanaPower)
         {
@@ -219,7 +236,7 @@ public class BossBattle : MonoBehaviour
                 }
                 else
                 {
-                    step = AnimationStep.GameStart;
+                    step = AnimationStep.FIVE;
                 }
                 break;
 
@@ -228,6 +245,11 @@ public class BossBattle : MonoBehaviour
                 __BanaPowerBonus.position = BanaPowerBonusInitialPosition;
                 step = AnimationStep.FOUR;
                 break;
+
+            case AnimationStep.FIVE_Wait:
+                step = AnimationStep.GameStart;
+                break;
+
         }
     }
 
@@ -246,7 +268,46 @@ public class BossBattle : MonoBehaviour
         banaPowerText.text = i.ToString();
         step = AnimationStep.FOUR;
     }
+    private void ChengeDifficultyLevel()
+    {
+        int sec = random.Next(1, 6);
+        if (MainMenu.GameMode == 0)
+        {
+            maxHp = 50;
+            CountDownTime = 5;
+        }
+        else
+        {
+            switch (sec)
+            {
+                case 1:
+                    maxHp = 10;
+                    CountDownTime = 1;
+                    break;
 
+                case 2:
+                    maxHp = 20;
+                    CountDownTime = 2;
+                    break;
+
+                case 3:
+                    maxHp = 30;
+                    CountDownTime = 3;
+                    break;
+
+                case 4:
+                    maxHp = 40;
+                    CountDownTime = 4;
+                    break;
+
+                case 5:
+                    maxHp = 50;
+                    CountDownTime = 5;
+                    break;
+
+            }
+        }
+    }
     public void ClickBigBanana()
     {
         if (step == AnimationStep.GameStart)
