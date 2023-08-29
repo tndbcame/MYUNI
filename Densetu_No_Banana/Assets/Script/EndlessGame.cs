@@ -309,7 +309,7 @@ public class EndlessGame : MonoBehaviour
         if (generationSec > __generationSec)
         {
             //ポジションを保持する
-            Vector2 retentionPosition = get_replace_bananas();
+            Vector2 retentionPosition = getReplaceBananas();
             //0に戻す
             generationSec = 0;
 
@@ -317,7 +317,7 @@ public class EndlessGame : MonoBehaviour
             bool bananaTransitionCountflg = true;
 
             //ループしながら次のバナナへ遷移
-            foreach (int BananaIndex in decide_bananas_to_use(banana_transition_count()))
+            foreach (int BananaIndex in decide_bananas_to_use(bananaTransitionCount()))
             {
                 //バナナのClone生成
                 GameObject BananaClone = (GameObject)Instantiate(bananasList[BananaIndex]);
@@ -361,7 +361,7 @@ public class EndlessGame : MonoBehaviour
     }
 
     //何段階か決める処理
-    private int banana_transition_count()
+    private int bananaTransitionCount()
     {
         int transitionCount = random.Next(1, bananasList.Count);
         return transitionCount;
@@ -387,7 +387,7 @@ public class EndlessGame : MonoBehaviour
     }
 
     //posListの中からランダムにバナナの入れ替える用位置を取得
-    private Vector2 get_replace_bananas()
+    private Vector2 getReplaceBananas()
     {
         int rnd = random.Next(bananaAprPosList.Count);
 
