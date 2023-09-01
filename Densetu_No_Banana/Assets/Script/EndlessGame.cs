@@ -84,6 +84,8 @@ public class EndlessGame : MonoBehaviour
     private int gameStatusFlg;
     //バナパワーのカウント
     private int banaCount;
+    //光るバナナをタップした回数
+    private int shinyBananaTapCount = 0;
 
     //初期設定
     void Start()
@@ -140,6 +142,9 @@ public class EndlessGame : MonoBehaviour
 
         //キャンセルトークン初期化
         token = cts.Token;
+
+        //難易度を変更する
+        ChengeLevel();
     }
 
 
@@ -233,7 +238,7 @@ public class EndlessGame : MonoBehaviour
                     //光るバナナのタップした回数を数える
                     GameController.totalScore += 1;
 
-                    if((GameController.totalScore - 19) % 20 == 0)
+                    if((GameController.totalScore - 24) % 25 == 0)
                     {
                         //bossflg(2)にする
                         gameStatusFlg = 2;
@@ -282,6 +287,10 @@ public class EndlessGame : MonoBehaviour
                     //サルジャンプアニメーション解除
                     jampMonkey.SetBool("judgeJamp", false);
 
+                    //バナナたちに変化を加える
+                    shinyBananaTapCount++;
+                    ChengeSpeed(shinyBananaTapCount);
+
                     //光るバナナの最低限のインターバル
                     await UniTask.Delay(TimeSpan.FromSeconds(1), cancellationToken: token);
                     whenTapBottunflg = true;
@@ -328,7 +337,12 @@ public class EndlessGame : MonoBehaviour
                 __bananaClone.position = retentionPosition;
 
                 //ランダムに遷移時間を決める
-                int sec = random.Next(min, max);
+                int _sec = random.Next(min, max);
+                double sec = _sec;
+                if (max == 1)
+                {
+                    sec /= 2;
+                }
 
                 if (bananaTransitionCountflg)
                 {
@@ -423,6 +437,55 @@ public class EndlessGame : MonoBehaviour
     {
         //光るバナナの初期位置に戻す
         __timeToTap.position = retentionPositionShinybanana;
+    }
+
+    //難易度の変更
+    private void ChengeLevel()
+    {
+        max--;
+        min--;
+
+        if (GameController.totalScore > 500)
+        {
+            max--;
+            min--;
+            __generationSec -= 0.3f;
+            chengingTimeForBlackBana = 0.6f;
+        }
+        else if(GameController.totalScore > 200)
+        {
+            max--;
+            min--;
+            __generationSec -= 0.2f;
+            chengingTimeForBlackBana = 0.8f;
+        }
+        else if(GameController.totalScore > 100)
+        {
+            __generationSec -= 0.10f;
+            chengingTimeForBlackBana = 0.9f;
+        }
+        else if (GameController.totalScore > 50)
+        {
+            __generationSec -= 0.05f;
+            chengingTimeForBlackBana = 1.2f;
+        }
+    }
+
+    //バナナが変わる早さを変えるよ
+    private void ChengeSpeed(int shinyBananaTapCount)
+    {
+        if(__generationSec > 0.08)
+        {
+            __generationSec -= 0.04f;
+        }
+        
+
+        if(shinyBananaTapCount % 4 == 0)
+        {
+            if(max >= 2) max--;
+
+            if(min >= 2) min--;
+        }
     }
 
     //バナパワー計算

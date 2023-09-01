@@ -514,11 +514,11 @@ MonoBehaviour:
   getBananaMonkey: {fileID: 427885161}
   climbingMonkey: {fileID: 1148308462}
   TimeToTap: {fileID: 1477061116}
-  min: 1
-  max: 2
-  chengingTimeForBlackBana: 0.9
+  min: 3
+  max: 5
+  chengingTimeForBlackBana: 1.5
   Score: {fileID: 144743317}
-  __generationSec: 0.04
+  __generationSec: 0.68
   banaPowerText: {fileID: 1357882231}
 --- !u!114 &138446189
 MonoBehaviour:
