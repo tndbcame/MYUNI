@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using KanKikuchi.AudioManager;
 
 public class GameStart : MonoBehaviour
 {
@@ -20,6 +21,8 @@ public class GameStart : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        //BGMManager.Instance.FadeOut();
+        
         if (MainMenu.GameMode == 0)
         {
             if (!GameController.notFirstTimeFlg)
@@ -63,6 +66,7 @@ public class GameStart : MonoBehaviour
         yield return new WaitForSeconds(f);
         //エンドレスモードスタート！
         GameController.gameStatus = 1;
+        BGMManager.Instance.Play(BGMPath.ENDLESS_BGM);
         scoreText.enabled = true;
         banaPowerText.enabled = true;
         bana.enabled = true;
@@ -73,6 +77,10 @@ public class GameStart : MonoBehaviour
         yield return new WaitForSeconds(f);
         //エンドレスモードスタート！
         GameController.gameStatus = 2;
+        BGMManager.Instance.Play(BGMPath.DEKA_BANANA_BGM);
         scoreText.enabled = true;
+
     }
+
+
 }

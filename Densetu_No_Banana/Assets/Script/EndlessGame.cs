@@ -6,6 +6,7 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using KanKikuchi.AudioManager;
 
 public class EndlessGame : MonoBehaviour
 {
@@ -236,12 +237,14 @@ public class EndlessGame : MonoBehaviour
                 if(clickedGameObject == shinybanana)
                 {
                     //光るバナナのタップした回数を数える
-                    GameController.totalScore += 1;
+                    GameController.totalScore ++;
 
                     if((GameController.totalScore - 24) % 25 == 0)
                     {
                         //bossflg(2)にする
                         gameStatusFlg = 2;
+                        BGMManager.Instance.FadeOut();
+                        BGMManager.Instance.Play(BGMPath.DEKA_BANANA_BGM);
                     }
                     
                     //スコア更新

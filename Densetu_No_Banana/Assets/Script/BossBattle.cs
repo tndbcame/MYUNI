@@ -270,39 +270,38 @@ public class BossBattle : MonoBehaviour
     }
     private void ChengeDifficultyLevel()
     {
-        int sec = random.Next(1, 6);
+        int sec = random.Next(5, 11);
         if (MainMenu.GameMode == 0)
         {
-            maxHp = 50;
+            maxHp = 90;
             CountDownTime = 5;
         }
         else
         {
+            //秒数を決める
+            CountDownTime = sec;
+
+            //タップする回数を決める
             switch (sec)
             {
-                case 1:
-                    maxHp = 10;
-                    CountDownTime = 1;
+                case 6:
+                    maxHp = 55;
                     break;
 
-                case 2:
-                    maxHp = 20;
-                    CountDownTime = 2;
+                case 7:
+                    maxHp = 65;
                     break;
 
-                case 3:
-                    maxHp = 30;
-                    CountDownTime = 3;
+                case 8:
+                    maxHp = 75;
                     break;
 
-                case 4:
-                    maxHp = 40;
-                    CountDownTime = 4;
+                case 9:
+                    maxHp = 85;
                     break;
 
-                case 5:
-                    maxHp = 50;
-                    CountDownTime = 5;
+                case 10:
+                    maxHp = 95;
                     break;
 
             }

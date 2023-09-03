@@ -11,6 +11,15 @@ public class FinishScreen : MonoBehaviour
     void Start()
     {
         YourScore.text = string.Format("あなたのスコア\n{0}", GameController.totalScore);
+
+        //現在のスコア
+        int scoreNow = GameController.totalScore;
+
+        int record = PlayerPrefs.GetInt("HiScore", 0);
+
+        if (scoreNow > record)
+            PlayerPrefs.SetInt("HiScore", scoreNow);
+
         GameController.totalScore = 0;
     }
 

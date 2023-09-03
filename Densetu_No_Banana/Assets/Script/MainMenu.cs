@@ -6,6 +6,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+using KanKikuchi.AudioManager;
+
 public class MainMenu : MonoBehaviour
 {
     //バナナラベルオブジェクト
@@ -14,6 +16,8 @@ public class MainMenu : MonoBehaviour
     [SerializeField] private Sprite bananaLabel2;
     //アニメーション定義
     [SerializeField] private Animator Shrink;
+    [SerializeField] private Animator Expand;
+
 
     private Image __bananaLabel;
     private Sprite bananaLabel1;
@@ -29,14 +33,14 @@ public class MainMenu : MonoBehaviour
     private bool swichGameflg = true;
     private void Start()
     {
-        __bananaLabel = bananaLabel.GetComponent<Image>();
-        bananaLabel1 = __bananaLabel.sprite;
-        bananaLabelText = bananaLabel.transform.GetChild(0).GetComponent<Text>();
+        Expand.SetTrigger("startExpand");
+        StartCoroutine(StartToMainmenu(2f));
     }
 
     //ゲームモードの切り替え
     public void onSwichGameMode()
     {
+        SEManager.Instance.Play(SEPath.KOUKAON1);
         if (swichGameflg)
         {
             if (GameMode == 0)
@@ -58,12 +62,13 @@ public class MainMenu : MonoBehaviour
     //ゲームスタート
     public void onStartEndlessGame()
     {
+        SEManager.Instance.Play(SEPath.KOUKAON1);
         swichGameflg = false;
         if (GameMode == 0)
         {
             StartCoroutine(StartEndlessGame());
         }
-        else if(GameMode == 1)
+        else if (GameMode == 1)
         {
             StartCoroutine(StartBigBananaGame());
         }
@@ -81,5 +86,15 @@ public class MainMenu : MonoBehaviour
         Shrink.SetTrigger("Shrink");
         yield return new WaitForSeconds(2f);
         SceneManager.LoadScene("GameScreen");
+    }
+
+    IEnumerator StartToMainmenu(float f)
+    {
+        yield return new WaitForSeconds(f);
+        //第二引数で音量調整も簡単にできる
+        BGMManager.Instance.Play(BGMPath.BGM1);
+        __bananaLabel = bananaLabel.GetComponent<Image>();
+        bananaLabel1 = __bananaLabel.sprite;
+        bananaLabelText = bananaLabel.transform.GetChild(0).GetComponent<Text>();
     }
 }

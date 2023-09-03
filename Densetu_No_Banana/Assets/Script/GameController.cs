@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using KanKikuchi.AudioManager;
 
 public class GameController : MonoBehaviour
 {
@@ -16,15 +17,17 @@ public class GameController : MonoBehaviour
 
     void Start()
     {
-        this.gameObject.GetComponent<GameStart>().enabled= true;
+        this.gameObject.GetComponent<GameStart>().enabled = true;
     }
 
     void LateUpdate()
     {
+
         switch (gameStatus)
         {
             case 1:
                 this.gameObject.GetComponent<EndlessGame>().enabled = true;
+                
                 break;
 
             case 2:
