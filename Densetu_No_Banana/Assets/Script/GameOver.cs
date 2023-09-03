@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 public class GameOver : MonoBehaviour
 {
     [SerializeField] private Animator GameOverAnime;
-    public static bool StartFinishAnimeflg = true;
+    public static bool StartFinishAnimeflg;
 
     void Start()
     {
@@ -17,7 +17,8 @@ public class GameOver : MonoBehaviour
         }
         else
         {
-            StartCoroutine(StartToWait(2f));
+            GameController.gameStatus = 0;
+            StartCoroutine(ToFinishScreen(2f));
         }
 
     }
@@ -26,10 +27,5 @@ public class GameOver : MonoBehaviour
     {
         yield return new WaitForSeconds(f);
         SceneManager.LoadScene("FinishGameScreen");
-    }
-
-    IEnumerator StartToWait(float f)
-    {
-        yield return new WaitForSeconds(f);
     }
 }

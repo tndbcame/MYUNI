@@ -18,6 +18,7 @@ public class BossBattle : MonoBehaviour
 
     [SerializeField] private Text banaPowerText;
     [SerializeField] private Image bana;
+    [SerializeField] private GameObject climbingMonkey;
 
     //ランダムインスタンス生成
     private System.Random random = new System.Random();
@@ -270,7 +271,7 @@ public class BossBattle : MonoBehaviour
     }
     private void ChengeDifficultyLevel()
     {
-        int sec = random.Next(5, 11);
+        int sec = random.Next(6, 11);
         if (MainMenu.GameMode == 0)
         {
             maxHp = 90;
@@ -311,6 +312,7 @@ public class BossBattle : MonoBehaviour
     {
         if (step == AnimationStep.GameStart)
         {
+            
             if (!(HP == 0))
             {
                 HP = HP - 1;
@@ -333,6 +335,7 @@ public class BossBattle : MonoBehaviour
             else if(HPbar.GetComponent<Slider>().value < (MonitoringBananaHP * 2 / 3))
             {
                 __bigBanana.sprite = bigbanana2;
+                climbingMonkey.GetComponent<SpriteRenderer>().enabled = false;
                 GameOver.StartFinishAnimeflg = false;
             }
             Debug.Log(HPbar.GetComponent<Slider>().value);
@@ -351,6 +354,7 @@ public class BossBattle : MonoBehaviour
     {
         yield return new WaitForSeconds(f);
         GameController.totalScore++;
+        climbingMonkey.GetComponent<SpriteRenderer>().enabled = true;
 
         if (MainMenu.GameMode == 1)
         {

@@ -18,6 +18,7 @@ public class GameController : MonoBehaviour
     void Start()
     {
         this.gameObject.GetComponent<GameStart>().enabled = true;
+        GameOver.StartFinishAnimeflg = true;
     }
 
     void LateUpdate()
@@ -27,7 +28,6 @@ public class GameController : MonoBehaviour
         {
             case 1:
                 this.gameObject.GetComponent<EndlessGame>().enabled = true;
-                
                 break;
 
             case 2:

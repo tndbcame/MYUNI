@@ -4,12 +4,16 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+using KanKikuchi.AudioManager;
+
 public class FinishScreen : MonoBehaviour
 {
     [SerializeField] private Text YourScore;
 
     void Start()
     {
+        BGMManager.Instance.FadeOut();
+
         YourScore.text = string.Format("あなたのスコア\n{0}", GameController.totalScore);
 
         //現在のスコア
@@ -25,11 +29,13 @@ public class FinishScreen : MonoBehaviour
 
     public void onReStart()
     {
+        SEManager.Instance.Play(SEPath.KOUKAON1);
         SceneManager.LoadScene("GameScreen");
     }
 
     public void onToMainMenu()
     {
+        SEManager.Instance.Play(SEPath.KOUKAON1);
         MainMenu.GameMode = 0;
         SceneManager.LoadScene("MainMenu");
     }

@@ -244,7 +244,6 @@ public class EndlessGame : MonoBehaviour
                         //bossflg(2)にする
                         gameStatusFlg = 2;
                         BGMManager.Instance.FadeOut();
-                        BGMManager.Instance.Play(BGMPath.DEKA_BANANA_BGM);
                     }
                     
                     //スコア更新
@@ -302,6 +301,7 @@ public class EndlessGame : MonoBehaviour
                     //bossflg(2)のとき
                     if (gameStatusFlg == 2)
                     {
+                        BGMManager.Instance.Play(BGMPath.DEKA_BANANA_BGM);
                         this.gameObject.GetComponent<EndlessGame>().enabled = false;
                     }
                     
