@@ -295,7 +295,6 @@ public class EndlessGame : MonoBehaviour
 
                     //光るバナナの最低限のインターバル
                     await UniTask.Delay(TimeSpan.FromSeconds(1), cancellationToken: token);
-                    whenTapBottunflg = true;
                     shinyBananaIntervalflg = true;
 
                     //bossflg(2)のとき
@@ -312,6 +311,7 @@ public class EndlessGame : MonoBehaviour
                     this.gameObject.GetComponent<EndlessGame>().enabled = false;
                 }
             }
+            whenTapBottunflg = true;
         }
     }
 

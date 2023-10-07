@@ -15,6 +15,7 @@ public class BossBattle : MonoBehaviour
     [SerializeField] private GameObject HPbar;
     [SerializeField] private Text scoreText;
     [SerializeField] private Text timeText;
+    [SerializeField] private Text HPtext;
 
     [SerializeField] private Text banaPowerText;
     [SerializeField] private Image bana;
@@ -37,6 +38,7 @@ public class BossBattle : MonoBehaviour
     private float MonitoringBananaHP;
     //バナナのHPの最初の一回を判定するフラグ
     private bool MonitoringBananaHPflg = false;
+    private bool GameStartAfterSecondTimesflg = false;
 
     private SpriteRenderer __bigBanana;
     private Sprite bigbanana1;
@@ -61,8 +63,8 @@ public class BossBattle : MonoBehaviour
         FOUR_Wait,
         FIVE_Wait,
         GameFinish,
+        THREE_SECONDS_TIME,
     }
-
 
     void Start()
     {
@@ -79,6 +81,7 @@ public class BossBattle : MonoBehaviour
         BanaPowerBonusInitialPosition = __BanaPowerBonus.position;
         StartCoroutine(GameStart(0.5f));
     }
+
     IEnumerator GameStart(float f)
     {
         //ステップ1
@@ -101,6 +104,21 @@ public class BossBattle : MonoBehaviour
         Instantiate(startEffect, bossAppearance.transform);
     }
 
+    IEnumerator GameStartAfterSecondTimes(float f)
+    {
+        //木につかまっているサルtrueにする
+        GameOver.StartFinishAnimeflg = true;
+        //でかばななスプライトを初期化
+        __bigBanana.sprite = bigbanana1;
+
+        yield return new WaitForSeconds(f);
+        //ゲーム２週目以降に建てるフラグだよ
+        GameStartAfterSecondTimesflg = true;
+
+        step = AnimationStep.THREE_SECONDS_TIME;
+    }
+
+
     void Update()
     {
         if(step == AnimationStep.GameStart)
@@ -113,7 +131,10 @@ public class BossBattle : MonoBehaviour
                 CountDownTime -= Time.deltaTime;
                 // カウントダウンタイムを整形して表示
                 timeText.text = CountDownTime.ToString("F");
-                
+
+                //HPtextの値の初期値を設定する
+                HPtext.text = HP + "/" + maxHp;
+
                 //Debug.Log(CountDownTime);
                 if (CountDownTime <= timeLimit)
                 {
@@ -132,11 +153,14 @@ public class BossBattle : MonoBehaviour
             bossAppearance.transform.GetChild(0).GetComponent<Text>().enabled = false;
             iTween.MoveTo(explainBossBattle, getITweenAnimations("updateY", __explainBossBattle, 6f, 1f, "OnUpdateValue"));
         }
-        else if (step == AnimationStep.THREE && Input.GetMouseButtonDown(0))
+        else if ((step == AnimationStep.THREE && Input.GetMouseButtonDown(0))|| step == AnimationStep.THREE_SECONDS_TIME)
         {
             //一回のループで一回まで押せるようにする
             step = AnimationStep.THREE_Wait;
-            iTween.MoveTo(explainBossBattle, getITweenAnimations("updateY", __explainBossBattle, 8f, 1f, "OnUpdatePosition"));
+            if (!GameStartAfterSecondTimesflg)
+            {
+                iTween.MoveTo(explainBossBattle, getITweenAnimations("updateY", __explainBossBattle, 8f, 1f, "OnUpdatePosition"));
+            }
             //大きなバナナ出現
             bigBanana.GetComponent<SpriteRenderer>().enabled = true;
             bigBanana.GetComponent<PolygonCollider2D>().enabled = true;
@@ -147,10 +171,10 @@ public class BossBattle : MonoBehaviour
             HPbar.transform.GetChild(1).transform.GetChild(0).GetComponent<Image>().enabled = true;
             scoreText.enabled = false;
             timeText.enabled = true;
+            HPtext.enabled = true;
 
             //ここでmaxHPと秒数を設定
             ChengeDifficultyLevel();
-            HP = maxHp;
         }
         else if (step == AnimationStep.FOUR)
         {
@@ -307,7 +331,10 @@ public class BossBattle : MonoBehaviour
 
             }
         }
+        //HPを設定
+        HP = maxHp;
     }
+
     public void ClickBigBanana()
     {
         if (step == AnimationStep.GameStart)
@@ -319,7 +346,8 @@ public class BossBattle : MonoBehaviour
             }
 
             //HPバーに反映。
-            HPbar.GetComponent<Slider>().value = (float)HP / (float)maxHp; ;
+            HPbar.GetComponent<Slider>().value = (float)HP / (float)maxHp;
+            HPtext.text = HP + "/" + maxHp;
             if (!MonitoringBananaHPflg)
             {
                 MonitoringBananaHPflg = true;
@@ -368,7 +396,7 @@ public class BossBattle : MonoBehaviour
             scoreText.enabled = true;
             scoreText.text = GameController.totalScore.ToString();
             //もう一度
-            StartCoroutine(GameStart(1f));
+            StartCoroutine(GameStartAfterSecondTimes(1f));
         }
         else
         {
