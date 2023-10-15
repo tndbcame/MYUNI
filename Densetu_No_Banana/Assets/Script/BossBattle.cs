@@ -395,6 +395,7 @@ public class BossBattle : MonoBehaviour
             timeText.enabled = false;
             scoreText.enabled = true;
             scoreText.text = GameController.totalScore.ToString();
+            HPtext.enabled = false;
             //もう一度
             StartCoroutine(GameStartAfterSecondTimes(1f));
         }
