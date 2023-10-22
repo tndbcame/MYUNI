@@ -101,7 +101,7 @@ public class EndlessGame : MonoBehaviour
         banaCount = 0;
 
         //スコアを設定
-        Score.text = GameController.totalScore.ToString();
+        Score.text = GameController.endlessTotalScore.ToString();
 
         // bananasの子オブジェクトの数を取得
         int childCount = bananas.transform.childCount;
@@ -237,9 +237,9 @@ public class EndlessGame : MonoBehaviour
                 if(clickedGameObject == shinybanana)
                 {
                     //光るバナナのタップした回数を数える
-                    GameController.totalScore ++;
+                    GameController.endlessTotalScore ++;
 
-                    if((GameController.totalScore - 24) % 25 == 0)
+                    if((GameController.endlessTotalScore - 24) % 25 == 0)
                     {
                         //bossflg(2)にする
                         gameStatusFlg = 2;
@@ -247,7 +247,7 @@ public class EndlessGame : MonoBehaviour
                     }
                     
                     //スコア更新
-                    Score.text = GameController.totalScore.ToString();
+                    Score.text = GameController.endlessTotalScore.ToString();
 
                     //ゲットバナナサルと光るバナナの位置を入れ替える
                     __getBananaMonkey.position = whenTapBottunPotion;
@@ -448,26 +448,26 @@ public class EndlessGame : MonoBehaviour
         max--;
         min--;
 
-        if (GameController.totalScore > 500)
+        if (GameController.endlessTotalScore > 500)
         {
             max--;
             min--;
             __generationSec -= 0.3f;
             chengingTimeForBlackBana = 0.6f;
         }
-        else if(GameController.totalScore > 200)
+        else if(GameController.endlessTotalScore > 200)
         {
             max--;
             min--;
             __generationSec -= 0.2f;
             chengingTimeForBlackBana = 0.8f;
         }
-        else if(GameController.totalScore > 100)
+        else if(GameController.endlessTotalScore > 100)
         {
             __generationSec -= 0.10f;
             chengingTimeForBlackBana = 0.9f;
         }
-        else if (GameController.totalScore > 50)
+        else if (GameController.endlessTotalScore > 50)
         {
             __generationSec -= 0.05f;
             chengingTimeForBlackBana = 1.2f;

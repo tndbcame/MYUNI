@@ -12,7 +12,8 @@ public class GameController : MonoBehaviour
      * エンドレスなら光るバナナをタップしたとき
      * デカバナナモードなら一体倒すごとに
      */
-    public static int totalScore = 0;
+    public static int endlessTotalScore = 0;
+    public static int dekabananaTotalScore = 0;
 
 
     void Start()

@@ -11,7 +11,6 @@ public class Setting : MonoBehaviour
     [SerializeField] private Text privacyPolicyText;
     [SerializeField] private Image ReturnButton;
     [SerializeField] private RegexHypertext privacyPolicy;
-    [SerializeField] private GameObject privacyPolicyObject;
 
 
     [SerializeField] private GameObject BGMBar;

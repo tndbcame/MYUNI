@@ -381,26 +381,27 @@ public class BossBattle : MonoBehaviour
     IEnumerator WaitWhenGameEnd(float f)
     {
         yield return new WaitForSeconds(f);
-        GameController.totalScore++;
         climbingMonkey.GetComponent<SpriteRenderer>().enabled = true;
 
         if (MainMenu.GameMode == 1)
         {
+            //でかばななモードのときのみプラスする
+            GameController.dekabananaTotalScore++;
 
-            
             //全部戻してもう一度
             bigBanana.GetComponent<SpriteRenderer>().enabled = false;
             bigBanana.GetComponent<PolygonCollider2D>().enabled = false;
             HPbar.transform.GetChild(0).GetComponent<Image>().enabled = false;
             timeText.enabled = false;
             scoreText.enabled = true;
-            scoreText.text = GameController.totalScore.ToString();
+            scoreText.text = GameController.dekabananaTotalScore.ToString();
             HPtext.enabled = false;
             //もう一度
             StartCoroutine(GameStartAfterSecondTimes(1f));
         }
         else
         {
+            GameController.endlessTotalScore++;
             this.gameObject.GetComponent<BossBattle>().enabled = false;
         }
     }

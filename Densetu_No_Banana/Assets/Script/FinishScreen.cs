@@ -13,18 +13,39 @@ public class FinishScreen : MonoBehaviour
     void Start()
     {
         BGMManager.Instance.FadeOut();
+        int scoreNow;
+        int record;
+        string HiScore;
 
-        YourScore.text = string.Format("あなたのスコア\n{0}", GameController.totalScore);
+        if (MainMenu.GameMode == 0)
+        {
+            YourScore.text = string.Format("あなたのスコア\n{0}", GameController.endlessTotalScore);
 
-        //現在のスコア
-        int scoreNow = GameController.totalScore;
+            //現在のスコア
+            HiScore = "EndlessHiscore";
 
-        int record = PlayerPrefs.GetInt("HiScore", 0);
+            scoreNow = GameController.endlessTotalScore;
+        }
+        else
+        {
+            YourScore.text = string.Format("あなたのスコア\n{0}", GameController.dekabananaTotalScore);
+
+            //現在のスコア
+            HiScore = "DekabananaHiscore";
+
+            scoreNow = GameController.dekabananaTotalScore;
+        }
+
+        record = PlayerPrefs.GetInt(HiScore, 0);
 
         if (scoreNow > record)
-            PlayerPrefs.SetInt("HiScore", scoreNow);
+            PlayerPrefs.SetInt(HiScore, scoreNow);
 
-        GameController.totalScore = 0;
+        //スコアの初期化
+        GameController.endlessTotalScore = 0;
+        GameController.dekabananaTotalScore = 0;
+
+
     }
 
     public void onReStart()
