@@ -128,11 +128,11 @@ public class BossBattle : MonoBehaviour
 
             if (!(HP <= 0) || GameClearflg)
             {
+                //カウントダウンタイムを更新
                 CountDownTime -= Time.deltaTime;
-                // カウントダウンタイムを整形して表示
                 timeText.text = CountDownTime.ToString("F");
 
-                //HPtextの値の初期値を設定する
+                //HPtextの値を更新
                 HPtext.text = HP + "/" + maxHp;
 
                 //Debug.Log(CountDownTime);
@@ -155,12 +155,23 @@ public class BossBattle : MonoBehaviour
         }
         else if ((step == AnimationStep.THREE && Input.GetMouseButtonDown(0))|| step == AnimationStep.THREE_SECONDS_TIME)
         {
+
             //一回のループで一回まで押せるようにする
             step = AnimationStep.THREE_Wait;
             if (!GameStartAfterSecondTimesflg)
             {
                 iTween.MoveTo(explainBossBattle, getITweenAnimations("updateY", __explainBossBattle, 8f, 1f, "OnUpdatePosition"));
             }
+
+            //maxHPと秒数を設定
+            ChengeDifficultyLevel();
+
+            //カウントダウンタイムの初期値を設定する
+            timeText.text = CountDownTime.ToString("F");
+
+            //HPtextの値の初期値を設定する
+            HPtext.text = HP + "/" + maxHp;
+
             //大きなバナナ出現
             bigBanana.GetComponent<SpriteRenderer>().enabled = true;
             bigBanana.GetComponent<PolygonCollider2D>().enabled = true;
@@ -173,8 +184,6 @@ public class BossBattle : MonoBehaviour
             timeText.enabled = true;
             HPtext.enabled = true;
 
-            //ここでmaxHPと秒数を設定
-            ChengeDifficultyLevel();
         }
         else if (step == AnimationStep.FOUR)
         {
@@ -231,9 +240,9 @@ public class BossBattle : MonoBehaviour
                 break;
 
             case "SHAKE":
-                hash.Add("x", 0.05f);//振動
-                hash.Add("y", 0.05f);//振動
-                hash.Add("time", 0.1f);
+                hash.Add("x", 0.02f);//振動
+                hash.Add("y", 0.02f);//振動
+                hash.Add("time", 0.04f);
                 hash.Add("oncomplete", met);
                 hash.Add("oncompletetarget", this.gameObject);
                 break;
@@ -295,16 +304,56 @@ public class BossBattle : MonoBehaviour
     }
     private void ChengeDifficultyLevel()
     {
+        float reductionNumber = 0f;
         int sec = random.Next(6, 11);
+
+        //カウントが上がる毎にカウントダウンの時間小さくなるように設定する
+        if (MainMenu.GameMode == 1 && GameController.dekabananaTotalScore > 0)
+        {
+            //前回のカウントダウンタイムに応じて
+            reductionNumber = 0.3f * GameController.dekabananaTotalScore * CountDownTime;
+        }
         if (MainMenu.GameMode == 0)
         {
+            //HPを設定
             maxHp = 90;
+
+            //カウントダウンを設定
             CountDownTime = 5;
+
+            //エンドレスモード二回目以降のでかばなな処理
+            if (GameController.endlessTotalScore > 200)
+            {
+                maxHp += (int)System.Math.Round(0.3 * GameController.endlessTotalScore);
+                CountDownTime += 0.05f * (int)System.Math.Round(GameController.endlessTotalScore / 25.0);
+            }
+            else if (GameController.endlessTotalScore > 100)
+            {
+                maxHp += (int)System.Math.Round(0.6 * GameController.endlessTotalScore);
+                CountDownTime += 0.4f * (int)System.Math.Round(GameController.endlessTotalScore / 25.0);
+            }
+            else if (GameController.endlessTotalScore > 25)
+            {
+                maxHp += (int)System.Math.Round(0.4 * GameController.endlessTotalScore);
+                CountDownTime += 0.4f * (int)System.Math.Round(GameController.endlessTotalScore / 25.0);
+            }
+
+
+
+            //バナパワーボーナス
+            if (int.Parse(banaPowerText.text) >= 50)
+            {
+                CountDownTime += 1;
+            }
         }
         else
         {
             //秒数を決める
             CountDownTime = sec;
+
+
+            //カウントダウンタイムを削る
+            CountDownTime -= reductionNumber;
 
             //タップする回数を決める
             switch (sec)

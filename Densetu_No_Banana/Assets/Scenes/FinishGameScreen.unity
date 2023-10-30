@@ -471,6 +471,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   YourScore: {fileID: 1866184553}
+  monkey: {fileID: 2145481784}
+  monkey1: {fileID: 21300000, guid: b7a21183b6f3143339696e5db1ddc565, type: 3}
+  monkey2: {fileID: 21300000, guid: 853932e031f2d4b7bbd83751f9c4606d, type: 3}
+  monkey3: {fileID: 21300000, guid: 1f33df5a227274e808c31833a7e1faf2, type: 3}
+  monkey4: {fileID: 21300000, guid: 4e55aa98b3aff47f2bc8dbe78ee8a6cb, type: 3}
+  monkey5: {fileID: 21300000, guid: fee144c3de6a24cdb90d59338201f485, type: 3}
 --- !u!4 &937134321
 Transform:
   m_ObjectHideFlags: 0
@@ -1035,7 +1041,7 @@ GameObject:
   - component: {fileID: 2145481786}
   - component: {fileID: 2145481785}
   m_Layer: 0
-  m_Name: relaxing_monkey
+  m_Name: monkey
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1101,7 +1107,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2145481784}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.17, y: 0.51, z: 0}
+  m_LocalPosition: {x: 0.17, y: 1.13, z: 0}
   m_LocalScale: {x: 0.4, y: 0.4, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
