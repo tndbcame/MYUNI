@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using KanKikuchi.AudioManager;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -59,6 +60,9 @@ public class TreasureChest : MonoBehaviour
 
     public void OnTresureChest()
     {
+
+        SEManager.Instance.Play(SEPath.KOUKAON1);
+
         //宝箱部品をenabledにする。
         switch (FinishScreenMonkeyImage)
         {
@@ -103,6 +107,8 @@ public class TreasureChest : MonoBehaviour
 
     public void OffTresureChest()
     {
+        SEManager.Instance.Play(SEPath.KOUKAON1);
+
         //宝箱部品をunenabledにする。
         selectionPoint1.transform.GetComponent<SpriteRenderer>().enabled = false;
         selectionPoint2.transform.GetComponent<SpriteRenderer>().enabled = false;
@@ -133,6 +139,8 @@ public class TreasureChest : MonoBehaviour
 
     public void SwitchSelectedButton1()
     {
+        SEManager.Instance.Play(SEPath.KOUKAON1);
+
         selectionPoint1.transform.GetComponent<SpriteRenderer>().enabled = true;
         selectionPoint2.transform.GetComponent<SpriteRenderer>().enabled = false;
         selectionPoint3.transform.GetComponent<SpriteRenderer>().enabled = false;
@@ -143,8 +151,9 @@ public class TreasureChest : MonoBehaviour
     }
     public void SwitchSelectedButton2()
     {
-        if(PlayerPrefs.GetInt("manpukuMonkey") == 1)
+        if (PlayerPrefs.GetInt("manpukuMonkey") == 1)
         {
+            SEManager.Instance.Play(SEPath.KOUKAON1);
             selectionPoint1.transform.GetComponent<SpriteRenderer>().enabled = false;
             selectionPoint2.transform.GetComponent<SpriteRenderer>().enabled = true;
             selectionPoint3.transform.GetComponent<SpriteRenderer>().enabled = false;
@@ -159,6 +168,7 @@ public class TreasureChest : MonoBehaviour
     {
         if (PlayerPrefs.GetInt("nigeMonkey") == 1)
         {
+            SEManager.Instance.Play(SEPath.KOUKAON1);
             selectionPoint1.transform.GetComponent<SpriteRenderer>().enabled = false;
             selectionPoint2.transform.GetComponent<SpriteRenderer>().enabled = false;
             selectionPoint3.transform.GetComponent<SpriteRenderer>().enabled = true;
@@ -172,6 +182,7 @@ public class TreasureChest : MonoBehaviour
     {
          if (PlayerPrefs.GetInt("hetohetoMonkey") == 1)
          {
+            SEManager.Instance.Play(SEPath.KOUKAON1);
             selectionPoint1.transform.GetComponent<SpriteRenderer>().enabled = false;
             selectionPoint2.transform.GetComponent<SpriteRenderer>().enabled = false;
             selectionPoint3.transform.GetComponent<SpriteRenderer>().enabled = false;
@@ -185,6 +196,7 @@ public class TreasureChest : MonoBehaviour
     {
           if (PlayerPrefs.GetInt("sadMonkey") == 1)
           {
+            SEManager.Instance.Play(SEPath.KOUKAON1);
             selectionPoint1.transform.GetComponent<SpriteRenderer>().enabled = false;
             selectionPoint2.transform.GetComponent<SpriteRenderer>().enabled = false;
             selectionPoint3.transform.GetComponent<SpriteRenderer>().enabled = false;
