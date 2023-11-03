@@ -18,6 +18,7 @@ public class MainMenu : MonoBehaviour
     [SerializeField] private Animator Shrink;
     [SerializeField] private Animator Expand;
 
+    [SerializeField] private Text username;
 
     private Image __bananaLabel;
     private Sprite bananaLabel1;
@@ -35,6 +36,7 @@ public class MainMenu : MonoBehaviour
     {
         Expand.SetTrigger("startExpand");
         StartCoroutine(StartToMainmenu(2f));
+        username.text = PlayerPrefs.GetString("UserName", "");
     }
 
     //ゲームモードの切り替え

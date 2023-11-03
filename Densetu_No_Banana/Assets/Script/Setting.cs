@@ -12,9 +12,9 @@ public class Setting : MonoBehaviour
     [SerializeField] private Image ReturnButton;
     [SerializeField] private RegexHypertext privacyPolicy;
 
-
     [SerializeField] private GameObject BGMBar;
     [SerializeField] private GameObject KoukaonBar;
+    [SerializeField] private GameObject username;
 
     public static float BGMVolume;
     public static float KoukaonVolume;
@@ -48,6 +48,9 @@ public class Setting : MonoBehaviour
         KoukaonBar.transform.GetChild(1).transform.GetChild(0).GetComponent<Image>().enabled = true;
         KoukaonBar.transform.GetChild(2).transform.GetChild(0).GetComponent<Image>().enabled = true;
 
+        username.transform.GetComponent<Image>().enabled = true;
+        username.transform.GetChild(0).transform.GetComponent<Text>().enabled = true;
+
         //urlを表示
         ShowURL();
     }
@@ -70,6 +73,9 @@ public class Setting : MonoBehaviour
         KoukaonBar.transform.GetChild(0).GetComponent<Image>().enabled = false;
         KoukaonBar.transform.GetChild(1).transform.GetChild(0).GetComponent<Image>().enabled = false;
         KoukaonBar.transform.GetChild(2).transform.GetChild(0).GetComponent<Image>().enabled = false;
+
+        username.transform.GetComponent<Image>().enabled = false;
+        username.transform.GetChild(0).transform.GetComponent<Text>().enabled = false;
 
         privacyPolicy.text = "";
         privacyPolicy.enabled = false;
