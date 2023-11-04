@@ -20,10 +20,8 @@ public class ShowRanking : MonoBehaviour
     private int LabelFlg = 1;
 
     
-
     private void Start()
     {
-        MainMenu.TrofyScreenFlg = 1;
         ShowRecord();
     }
 
