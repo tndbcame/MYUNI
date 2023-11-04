@@ -1,10 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
+using KanKikuchi.AudioManager;
+using NCMB;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-
-using KanKikuchi.AudioManager;
 
 public class FinishScreen : MonoBehaviour
 {
@@ -70,7 +68,11 @@ public class FinishScreen : MonoBehaviour
         record = PlayerPrefs.GetInt(HiScore, 0);
 
         if (scoreNow > record)
+        {
             PlayerPrefs.SetInt(HiScore, scoreNow);
+            //スコアをランキングに登録する
+            SaveScore(scoreNow);
+        }
 
         //スコアの初期化
         GameController.endlessTotalScore = 0;
@@ -90,5 +92,42 @@ public class FinishScreen : MonoBehaviour
         SEManager.Instance.Play(SEPath.KOUKAON1);
         MainMenu.GameMode = 0;
         SceneManager.LoadScene("MainMenu");
+    }
+
+    //スコアをランキング保存する
+    private void SaveScore(int Score)
+    {
+        //ランキングに登録
+        if (MainMenu.GameMode == 0)
+        {
+
+            NCMBObject endlessRankingClass = new NCMBObject("endlessRankingClass");
+            //UserNameを登録する
+            endlessRankingClass["UserName"] = PlayerPrefs.GetString("UserName", "");
+            endlessRankingClass["EndlessScore"] = Score;
+            endlessRankingClass.SaveAsync((NCMBException e) =>
+            {
+                if (e != null)
+                    Debug.Log("Error: " + e.ErrorMessage);
+                else
+                    Debug.Log("success");
+            });
+        }
+        else
+        {
+            NCMBObject dekabananaRankingClass = new NCMBObject("dekabananaRankingClass");
+            //UserNameを登録する
+            dekabananaRankingClass["UserName"] = PlayerPrefs.GetString("UserName", "");
+            dekabananaRankingClass["DekabananaScore"] = Score;
+            dekabananaRankingClass.SaveAsync((NCMBException e) =>
+            {
+                if (e != null)
+                    Debug.Log("Error: " + e.ErrorMessage);
+                else
+                    Debug.Log("success");
+            });
+        }
+            
+
     }
 }

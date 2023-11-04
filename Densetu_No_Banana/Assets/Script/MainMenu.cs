@@ -24,6 +24,8 @@ public class MainMenu : MonoBehaviour
     private Sprite bananaLabel1;
     private Text bananaLabelText;
 
+    public static int TrofyScreenFlg;
+
     /*
      * 0:エンドレス
      * 1:デカバナナ
@@ -34,8 +36,12 @@ public class MainMenu : MonoBehaviour
     private bool swichGameflg = true;
     private void Start()
     {
-        Expand.SetTrigger("startExpand");
-        StartCoroutine(StartToMainmenu(2f));
+        if(TrofyScreenFlg != 1)
+        {
+            Expand.SetTrigger("startExpand");
+            StartCoroutine(StartToMainmenu(2f));
+        }
+        TrofyScreenFlg = 0;
         username.text = PlayerPrefs.GetString("UserName", "");
     }
 
@@ -98,5 +104,10 @@ public class MainMenu : MonoBehaviour
         __bananaLabel = bananaLabel.GetComponent<Image>();
         bananaLabel1 = __bananaLabel.sprite;
         bananaLabelText = bananaLabel.transform.GetChild(0).GetComponent<Text>();
+    }
+
+    public void toRankingScreen()
+    {
+        SceneManager.LoadScene("RankingScreen");
     }
 }
