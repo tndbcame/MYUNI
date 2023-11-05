@@ -19,7 +19,9 @@ public class ShowRanking : MonoBehaviour
 
     private int LabelFlg = 1;
 
-    
+    private bool ShowRecordFlg = true;
+
+
     private void Start()
     {
         ShowRecord();
@@ -27,6 +29,7 @@ public class ShowRanking : MonoBehaviour
 
     public void ShowRecord()
     {
+        ShowRecordFlg = false;
         int rank = 1;
         string GameMode = "EndlessScore";
         string RankingClass = "endlessRankingClass";
@@ -77,14 +80,20 @@ public class ShowRanking : MonoBehaviour
 
                     //fitさせる
                     rankingRecordClone.transform.SetParent(Content.transform, false);
+
+                    if (i == 99)
+                        break;
                 }
             }
+
+            ShowRecordFlg = true;
+
         });
     }
 
     public void chengeGameMode()
     {
-        if(LabelFlg == 1)
+        if(LabelFlg == 1 && ShowRecordFlg)
         {
             SEManager.Instance.Play(SEPath.KOUKAON1);
             GameObject[] clones = GameObject.FindGameObjectsWithTag("clone");
@@ -96,7 +105,7 @@ public class ShowRanking : MonoBehaviour
             gameModeLabel.text = "でかばなな";
             ShowRecord();
         }
-        else if(LabelFlg == 2)
+        else if(LabelFlg == 2 && ShowRecordFlg)
         {
             SEManager.Instance.Play(SEPath.KOUKAON1);
             GameObject[] clones = GameObject.FindGameObjectsWithTag("clone");
